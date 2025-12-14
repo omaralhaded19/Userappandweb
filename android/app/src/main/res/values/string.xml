@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SeoHost</string>
+    <string name="facebook_app_id">708785228624825</string>
+    <string name="fb_login_protocol_scheme">fb708785228624825</string>
+    <string name="facebook_client_token">393fae79f2fae4f3ce36e6de683895d9</string>
+</resources>

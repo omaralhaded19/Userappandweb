@@ -1,0 +1,118 @@
+{
+  "project_info": {
+    "project_number": "766014068058",
+    "project_id": "alrafayah2026-a9c37",
+    "storage_bucket": "alrafayah2026-a9c37.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766014068058:android:5d68cb72fd16336c504f63",
+        "android_client_info": {
+          "package_name": "com.alrafayah.shooping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3IOqUo9Q2FuNFGO9stIZkrq-YoQZ9gI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "766014068058-i5hl3oh8ubj38bmvb1b3nmqu2j0ncc5q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alrafayah.shooping"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766014068058:android:f97463ad5cbb679a504f63",
+        "android_client_info": {
+          "package_name": "com.alrafayah.shoopingadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3IOqUo9Q2FuNFGO9stIZkrq-YoQZ9gI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "766014068058-i5hl3oh8ubj38bmvb1b3nmqu2j0ncc5q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alrafayah.shooping"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766014068058:android:63fa21b7312f8ebb504f63",
+        "android_client_info": {
+          "package_name": "com.alrafayah.shoopingcar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3IOqUo9Q2FuNFGO9stIZkrq-YoQZ9gI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "766014068058-i5hl3oh8ubj38bmvb1b3nmqu2j0ncc5q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alrafayah.shooping"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <base href="/">
+  <meta name="google-signin-client_id" content="766014068058-vvltmmm10lm9pc762h9v8an6p84qabec.apps.googleusercontent.com">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A multi-vendor service providing app.">
+  <meta name="robots" content="nofollow, noindex, max-snippet:1, max-video-preview:1, max-image-preview:standard">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="مؤسسة الرفايعة للخدمات المنزلية">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <title>مؤسسة الرفايعة للخدمات المنزلية</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script type="application/javascript" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" defer></script>
+  <style>.grecaptcha-badge { visibility: hidden;} </style>
+  <script>
+    var serviceWorkerVersion = {{flutter_service_worker_version}};
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service_worker.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch((error) => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+  </script>
+  <script>
+    if (
+      navigator.userAgent.indexOf("Safari") !== -1 &&
+      navigator.userAgent.indexOf("Chrome") === -1
+    ) {
+      var originalGetContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function () {
+        var contextType = arguments[0];
+        if (contextType === "webgl2") {
+          return;
+        }
+        return originalGetContext.apply(
+          this,
+          [contextType].concat(Array.prototype.slice.call(arguments, 1))
+        );
+      };
+    }
+  </script>
+  <script src="flutter.js?version=3.3" defer></script>
+</head>
+<body>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAM0lUMDPBpS8v0-Z8s80rp626M4we3Iv8-MHjY&loading=async&callback=Function.prototype"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
+  <div class="preloader">
+    <div class="preloader-container">
+      <img width="60" class="preloader-img" src="logo.png" alt="">
+      <div class="loader"></div>
+    </div>
+  </div>
+  <header class="header">
+    <div class="header-container d-flex align-items-center justify-content-between">
+      <div class="header-start d-flex gap-5 align-items-center">
+        <img class="logo" src="appbarlogo.png" alt="">
+        <div class="placeholder placeholder-wide"></div>
+        <div class="placeholder"></div>
+        <div class="placeholder"></div>
+        <div class="placeholder"></div>
+      </div>
+      <div class="header-end d-flex gap-5">
+        <div class="placeholder"></div>
+        <div class="placeholder"></div>
+        <div class="placeholder"></div>
+      </div>
+    </div>
+  </header>
+  <script>
+    document.querySelectorAll("img.svg").forEach(function (img) {
+    var imgID = img.getAttribute("id");
+    var imgClass = img.getAttribute("class");
+    var imgURL = img.getAttribute("src");
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", imgURL, true);
+    xhr.responseType = "document";
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        var data = xhr.response;
+        var svg = data.querySelector("svg");
+        if (typeof imgID !== "undefined") {
+          svg.setAttribute("id", imgID);
+        }
+        if (typeof imgClass !== "undefined") {
+          svg.setAttribute("class", imgClass + " replaced-svg");
+        }
+        svg.removeAttribute("xmlns:a");
+        if (!svg.getAttribute("viewBox") && svg.getAttribute("height") && svg.getAttribute("width")) {
+          svg.setAttribute("viewBox", "0 0 " + svg.getAttribute("height") + " " + svg.getAttribute("width"));
+        }
+        img.parentNode.replaceChild(svg, img);
+      }
+    };
+    xhr.send();
+  });
+  </script>
+  <script>
+    window.addEventListener('load', function(ev) {
+      {{flutter_js}}
+      {{flutter_build_config}}
+
+      _flutter.loader.load({
+        serviceWorker: {
+          serviceWorkerVersion: {{flutter_service_worker_version}},
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            if(document.getElementById('splash'))
+              document.getElementById('splash').remove();
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+  <script>
+      if (typeof(Storage) !== "undefined") {
+        var itemValue = localStorage.getItem("flutter.demand_theme");
+
+        console.log("flutter.theme", itemValue)
+        if (itemValue !== null) {
+          if (itemValue === "true") {
+            document.body.classList.add("theme-dark");
+          } else {
+            document.body.classList.remove("theme-light");
+          }
+        } else {
+          console.log("Item not found in localStorage");
+        }
+      } else {
+        console.log("localStorage is not supported in this browser");
+      }
+  </script>
+  <script>
+    import { initializeApp } from "firebase/app";
+    import { getAnalytics } from "firebase/analytics";
+    const firebaseConfig = {
+      apiKey: "AIzaSyByFcLBKAppS9mf7Ta_5QcrbKY8Pd8NzF4",
+      authDomain: "alrafayah2026-a9c37.firebaseapp.com",
+      projectId: "alrafayah2026-a9c37",
+      storageBucket: "alrafayah2026-a9c37.firebasestorage.app",
+      messagingSenderId: "766014068058",
+      appId: "1:766014068058:web:e5c89479370d3397504f63"
+    };
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+</body>
+</html>
