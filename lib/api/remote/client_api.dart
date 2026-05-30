@@ -21,9 +21,11 @@ class ApiClient extends GetxService {
     printLog('Token: $token');
     AddressModel? addressModel;
     try {
-      addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-      printLog( addressModel.toJson());
-    }catch(e) {
+      addressModel = AddressModel.fromJson(
+        jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!),
+      );
+      printLog(addressModel.toJson());
+    } catch (e) {
       if (kDebugMode) {
         print('');
       }
@@ -31,29 +33,44 @@ class ApiClient extends GetxService {
 
     ///pick zone id to update header
     updateHeader(
-      token, addressModel?.zoneId,
-      sharedPreferences.getString(AppConstants.languageCode), sharedPreferences.getString(AppConstants.guestId)
+      token,
+      addressModel?.zoneId,
+      sharedPreferences.getString(AppConstants.languageCode),
+      sharedPreferences.getString(AppConstants.guestId),
     );
   }
-  void updateHeader(String? token, String? zoneIDs, String? languageCode, String? guestID) {
+  void updateHeader(
+    String? token,
+    String? zoneIDs,
+    String? languageCode,
+    String? guestID,
+  ) {
+    final bool hasValidToken =
+        token != null && token.isNotEmpty && token != 'null';
+
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
       AppConstants.zoneId: zoneIDs ?? '',
-      AppConstants.localizationKey: languageCode ?? AppConstants.languages[0].languageCode!,
-      'Authorization': 'Bearer $token',
-      AppConstants.guestId : guestID ?? "",
+      AppConstants.localizationKey:
+          languageCode ?? AppConstants.languages[0].languageCode!,
+      AppConstants.guestId: guestID ?? "",
     };
+
+    if (hasValidToken) {
+      _mainHeaders['Authorization'] = 'Bearer $token';
+    }
   }
 
-  Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers}) async {
-
+  Future<Response> getData(
+    String uri, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+  }) async {
     try {
       printLog('====> API Call: $uri\nHeader: $_mainHeaders');
-      http.Response response = await http.get(
-        Uri.parse(appBaseUrl! + uri),
-        headers: headers ?? _mainHeaders,
-
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .get(Uri.parse(appBaseUrl! + uri), headers: headers ?? _mainHeaders)
+          .timeout(Duration(seconds: timeoutInSeconds));
 
       return handleResponse(response, uri);
     } catch (e) {
@@ -61,17 +78,22 @@ class ApiClient extends GetxService {
     }
   }
 
-  Future<Response> postData(String? uri, dynamic body, {Map<String, String>? headers}) async {
+  Future<Response> postData(
+    String? uri,
+    dynamic body, {
+    Map<String, String>? headers,
+  }) async {
     printLog('====> API Call: $uri\nHeader: $_mainHeaders');
     printLog('====> body : ${body.toString()}');
 
-
-    http.Response response = await http.post(
-      Uri.parse(appBaseUrl! + uri!),
-      body: jsonEncode(body),
-      headers: headers ?? _mainHeaders,
-    ).timeout(Duration(seconds: timeoutInSeconds));
     try {
+      http.Response response = await http
+          .post(
+            Uri.parse(appBaseUrl! + uri!),
+            body: jsonEncode(body),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri);
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
@@ -79,81 +101,128 @@ class ApiClient extends GetxService {
   }
 
   Future<Response> postMultipartDataConversation(
-      String? uri,
-      Map<String, String> body,
-      List<MultipartBody>? multipartBody,
-      {Map<String, String>? headers,List<PlatformFile>? otherFile}) async {
-
-    http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(appBaseUrl!+uri!));
+    String? uri,
+    Map<String, String> body,
+    List<MultipartBody>? multipartBody, {
+    Map<String, String>? headers,
+    List<PlatformFile>? otherFile,
+  }) async {
+    http.MultipartRequest request = http.MultipartRequest(
+      'POST',
+      Uri.parse(appBaseUrl! + uri!),
+    );
     request.headers.addAll(headers ?? _mainHeaders);
 
-    if(otherFile != null ) {
-      if(otherFile.isNotEmpty){
-        for(PlatformFile platformFile in otherFile){
-          request.files.add(http.MultipartFile('files[${otherFile.indexOf(platformFile)}]', platformFile.readStream!, platformFile.size, filename: basename(platformFile.name)));
+    if (otherFile != null) {
+      if (otherFile.isNotEmpty) {
+        for (PlatformFile platformFile in otherFile) {
+          request.files.add(
+            http.MultipartFile(
+              'files[${otherFile.indexOf(platformFile)}]',
+              platformFile.readStream!,
+              platformFile.size,
+              filename: basename(platformFile.name),
+            ),
+          );
         }
       }
     }
-    if(multipartBody!=null){
-      for(MultipartBody multipart in multipartBody) {
+    if (multipartBody != null) {
+      for (MultipartBody multipart in multipartBody) {
         Uint8List list = await multipart.file.readAsBytes();
-        request.files.add(http.MultipartFile(
-          multipart.key!, multipart.file.readAsBytes().asStream(), list.length, filename:'${DateTime.now().toString()}.png',
-        ));
+        request.files.add(
+          http.MultipartFile(
+            multipart.key!,
+            multipart.file.readAsBytes().asStream(),
+            list.length,
+            filename: '${DateTime.now().toString()}.png',
+          ),
+        );
       }
     }
     request.fields.addAll(body);
-    http.Response response = await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     return handleResponse(response, uri);
   }
 
-  Future<Response> postMultipartData(String? uri, Map<String, String> body, List<MultipartBody>? multipartBody, {Map<String, String>? headers}) async {
+  Future<Response> postMultipartData(
+    String? uri,
+    Map<String, String> body,
+    List<MultipartBody>? multipartBody, {
+    Map<String, String>? headers,
+  }) async {
     try {
-      http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(appBaseUrl!+uri!));
+      http.MultipartRequest request = http.MultipartRequest(
+        'POST',
+        Uri.parse(appBaseUrl! + uri!),
+      );
       request.headers.addAll(headers ?? _mainHeaders);
-      for(MultipartBody multipart in multipartBody!) {
-        if(kIsWeb) {
+      for (MultipartBody multipart in multipartBody!) {
+        if (kIsWeb) {
           Uint8List list = await multipart.file.readAsBytes();
           http.MultipartFile part = http.MultipartFile(
-            multipart.key!, multipart.file.readAsBytes().asStream(), list.length,
-            filename: basename(multipart.file.path), contentType: MediaType('images', 'jpg'),
+            multipart.key!,
+            multipart.file.readAsBytes().asStream(),
+            list.length,
+            filename: basename(multipart.file.path),
+            contentType: MediaType('images', 'jpg'),
           );
           request.files.add(part);
-        }else {
+        } else {
           File file = File(multipart.file.path);
-          request.files.add(http.MultipartFile(
-            multipart.key!, file.readAsBytes().asStream(), file.lengthSync(), filename: file.path.split('/').last,
-          ));
+          request.files.add(
+            http.MultipartFile(
+              multipart.key!,
+              file.readAsBytes().asStream(),
+              file.lengthSync(),
+              filename: file.path.split('/').last,
+            ),
+          );
         }
       }
       request.fields.addAll(body);
-      http.Response response = await http.Response.fromStream(await request.send());
+      http.Response response = await http.Response.fromStream(
+        await request.send(),
+      );
       return handleResponse(response, uri);
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Future<Response> putData(String? uri, dynamic body, {Map<String, String>? headers}) async {
+  Future<Response> putData(
+    String? uri,
+    dynamic body, {
+    Map<String, String>? headers,
+  }) async {
     printLog('====> body : ${body.toString()}');
     try {
-      http.Response response = await http.put(
-        Uri.parse(appBaseUrl!+uri!),
-        body: jsonEncode(body),
-        headers: headers ?? _mainHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .put(
+            Uri.parse(appBaseUrl! + uri!),
+            body: jsonEncode(body),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri);
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Future<Response> deleteData(String? uri, {Map<String, String>? headers}) async {
+  Future<Response> deleteData(
+    String? uri, {
+    Map<String, String>? headers,
+  }) async {
     try {
-      http.Response response = await http.delete(
-        Uri.parse(appBaseUrl!+uri!),
-        headers: headers ?? _mainHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .delete(
+            Uri.parse(appBaseUrl! + uri!),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri);
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
@@ -164,29 +233,48 @@ class ApiClient extends GetxService {
     dynamic body;
     try {
       body = jsonDecode(response.body);
-    }catch(e) {
+    } catch (e) {
       if (kDebugMode) {
         print("");
       }
     }
     Response response0 = Response(
-      body: body ?? response.body, bodyString: response.body.toString(),
-      request: Request(headers: response.request!.headers, method: response.request!.method, url: response.request!.url),
-      headers: response.headers, statusCode: response.statusCode, statusText: response.reasonPhrase,
+      body: body ?? response.body,
+      bodyString: response.body.toString(),
+      request: Request(
+        headers: response.request!.headers,
+        method: response.request!.method,
+        url: response.request!.url,
+      ),
+      headers: response.headers,
+      statusCode: response.statusCode,
+      statusText: response.reasonPhrase,
     );
-    if(response0.statusCode != 200 && response0.body != null && response0.body is !String) {
-      if(response0.body.toString().startsWith('{response_code:')) {
+    if (response0.statusCode != 200 &&
+        response0.body != null &&
+        response0.body is! String) {
+      if (response0.body.toString().startsWith('{response_code:')) {
         ErrorsModel errorResponse = ErrorsModel.fromJson(response0.body);
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: errorResponse.responseCode);
-      }else if(response0.body.toString().startsWith('{message')) {
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: response0.body['message']);
+        response0 = Response(
+          statusCode: response0.statusCode,
+          body: response0.body,
+          statusText: errorResponse.responseCode,
+        );
+      } else if (response0.body.toString().startsWith('{message')) {
+        response0 = Response(
+          statusCode: response0.statusCode,
+          body: response0.body,
+          statusText: response0.body['message'],
+        );
       }
-    }else if(response0.statusCode != 200 && response0.body == null) {
+    } else if (response0.statusCode != 200 && response0.body == null) {
       response0 = Response(statusCode: 0, statusText: noInternetMessage);
     }
-    if(foundation.kDebugMode) {
-       //debugPrint('====> API Response: [${response0.statusCode}] $uri');
-       debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+    if (foundation.kDebugMode) {
+      //debugPrint('====> API Response: [${response0.statusCode}] $uri');
+      debugPrint(
+        '====> API Response: [${response0.statusCode}] $uri\n${response0.body}',
+      );
     }
     return response0;
   }

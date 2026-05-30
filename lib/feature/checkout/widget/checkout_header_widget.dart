@@ -1,92 +1,130 @@
 import 'package:seohost/utils/core_export.dart';
 import 'package:get/get.dart';
+import 'package:seohost/common/widgets/qadha_branding.dart';
 
 class CheckoutHeaderWidget extends StatelessWidget {
   final String pageState;
-  const CheckoutHeaderWidget({super.key, required this.pageState}) ;
+  const CheckoutHeaderWidget({super.key, required this.pageState});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox( width: 426, child: GetBuilder<CheckOutController>(builder: (controller){
-      return Column( children: [
-        Padding(padding:  const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge, vertical: Dimensions.paddingSizeSmall),
-          child:  Stack( children: [
+    return SizedBox(
+      width: 426,
+      child: GetBuilder<CheckOutController>(
+        builder: (controller) {
+          final orderActive =
+              controller.currentPageState == PageState.orderDetails &&
+              PageState.orderDetails.name == pageState;
+          final paymentActive =
+              controller.currentPageState == PageState.payment ||
+              PageState.payment.name == pageState;
+          final completeActive =
+              controller.currentPageState == PageState.complete ||
+              pageState == 'complete';
 
-            SizedBox( height: 55, child: Row( mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-
-              CustomHeaderIcon( assetIconSelected: Images.orderDetailsSelected, assetIconUnSelected: Images.orderDetailsUnselected,
-                isActiveColor: controller.currentPageState == PageState.orderDetails ? true : false,
-              ),
-
-              controller.currentPageState == PageState.orderDetails ?
-              const CustomHeaderLine(color: Color(0xffFF833D), gradientColor1: Color(0xffFDA21A), gradientColor2: Colors.orangeAccent,) :
-              const CustomHeaderLine(gradientColor1: Colors.deepOrange, gradientColor2: Colors.orangeAccent),
-
-              CustomHeaderIcon(assetIconSelected: Images.paymentSelected, assetIconUnSelected: Images.paymentUnSelected,
-                isActiveColor: controller.currentPageState == PageState.payment ? true : false,
-              ),
-
-              controller.cancelPayment ?
-              const CustomHeaderLine(cancelOrder: true, gradientColor1: Colors.grey, gradientColor2: Colors.grey,) : controller.currentPageState == PageState.payment ?
-              const CustomHeaderLine(color: Colors.green, gradientColor1: Colors.orangeAccent, gradientColor2: Colors.green,) :
-              const CustomHeaderLine(gradientColor1: Colors.orangeAccent, gradientColor2: Colors.greenAccent,),
-
-              CustomHeaderIcon(assetIconSelected: controller.cancelPayment? Images.completeSelected : Images.completeSelected,
-                assetIconUnSelected: Images.completeUnSelected,
-                isActiveColor: controller.currentPageState == PageState.complete ? true : false
-              ),
-
-            ],),),
-
-
-            controller.currentPageState == PageState.orderDetails  && PageState.orderDetails.name == pageState ?
-            Positioned( top: 0, bottom: 0,
-              left: Get.find<LocalizationController>().isLtr ? 0: null,
-              right:Get.find<LocalizationController>().isLtr ? null: 0,
-              child: Container( height: 55, width: 55,
-                decoration: BoxDecoration( borderRadius: BorderRadius.circular(50),
-                  image: DecorationImage(fit: BoxFit.fill, image: AssetImage( Images.orderDetailsSelected,),),
+          return QadhaGlassCard(
+            radius: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+            child: Row(
+              children: [
+                _CheckoutStep(
+                  title: 'booking_details'.tr,
+                  icon: Icons.description_rounded,
+                  active: orderActive,
+                  done: paymentActive || completeActive,
                 ),
-              ),) : const SizedBox(),
-
-
-            controller.currentPageState == PageState.payment  || PageState.payment.name == pageState ?
-            Positioned( child: Align( alignment: Alignment.center,
-              child: Container( height: 55, width: 55,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50),
-                  image: DecorationImage( fit: BoxFit.fill, image: AssetImage( Images.paymentSelected)),
+                _CheckoutLine(done: completeActive),
+                _CheckoutStep(
+                  title: 'payment'.tr,
+                  icon: Icons.credit_card_rounded,
+                  active: paymentActive,
+                  done: completeActive,
                 ),
-              ),
-            )) :  const SizedBox(),
-
-
-            controller.currentPageState == PageState.complete || pageState == 'complete' ?
-            Positioned( top: 0, bottom: 0,
-              right: Get.find<LocalizationController>().isLtr ? 0:null,
-              left: Get.find<LocalizationController>().isLtr ? null: 0,
-              child: Container( height: 55, width: 55,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    image: DecorationImage(fit: BoxFit.fill, image: AssetImage( Images.completeSelected,),),
+                _CheckoutLine(done: paymentActive || completeActive),
+                _CheckoutStep(
+                  title: 'complete'.tr,
+                  icon: Icons.check_rounded,
+                  active: completeActive,
+                  done: completeActive,
                 ),
-              ),
-            ) : const SizedBox(),
-
-
-          ]),
-        ),
-
-        Padding( padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault,left: Dimensions.paddingSizeDefault,right: Dimensions.paddingSizeDefault),
-          child: Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,  crossAxisAlignment: CrossAxisAlignment.center, children:  [
-            CustomText( text: "booking_details".tr, isActive :controller.currentPageState == PageState.orderDetails && PageState.orderDetails.name == pageState),
-            Padding(padding: const EdgeInsets.only(right: 25.0),
-              child: CustomText(text: "payment".tr,isActive :controller.currentPageState == PageState.payment || PageState.payment.name == pageState),
+              ],
             ),
-            CustomText(text: "complete".tr,isActive : controller.currentPageState == PageState.complete  || pageState == 'complete'),
-          ]),
-        ),
+          );
+        },
+      ),
+    );
+  }
+}
 
-      ]);},
-    ));
+class _CheckoutStep extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final bool active;
+  final bool done;
+
+  const _CheckoutStep({
+    required this.title,
+    required this.icon,
+    required this.active,
+    required this.done,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = done
+        ? QadhaPalette.green
+        : active
+        ? QadhaPalette.blue
+        : const Color(0xFF9AA7BC);
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 58,
+            width: 58,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: done || active ? .15 : .08),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withValues(alpha: .35)),
+            ),
+            child: Icon(
+              done ? Icons.check_rounded : icon,
+              color: color,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: robotoMedium.copyWith(color: color, fontSize: 13, height: 1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CheckoutLine extends StatelessWidget {
+  final bool done;
+
+  const _CheckoutLine({required this.done});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        height: 3,
+        margin: const EdgeInsets.only(bottom: 32),
+        decoration: BoxDecoration(
+          color: done ? QadhaPalette.green : const Color(0xFFE4ECF7),
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
   }
 }

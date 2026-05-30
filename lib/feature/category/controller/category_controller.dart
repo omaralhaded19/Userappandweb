@@ -11,7 +11,7 @@ class CategoryController extends GetxController implements GetxService {
   List<CategoryModel>? _categoryList;
   List<CategoryModel>? _subCategoryList;
   List<Service>? _searchProductList = [];
-  List<CategoryModel>? _campaignBasedCategoryList ;
+  List<CategoryModel>? _campaignBasedCategoryList;
 
   bool _isLoading = false;
   int? _pageSize;
@@ -20,7 +20,8 @@ class CategoryController extends GetxController implements GetxService {
   final String _searchText = '';
 
   List<CategoryModel>? get categoryList => _categoryList;
-  List<CategoryModel>? get campaignBasedCategoryList => _campaignBasedCategoryList;
+  List<CategoryModel>? get campaignBasedCategoryList =>
+      _campaignBasedCategoryList;
   List<CategoryModel>? get subCategoryList => _subCategoryList;
   List<Service>? get searchServiceList => _searchProductList;
   bool get isLoading => _isLoading;
@@ -29,15 +30,15 @@ class CategoryController extends GetxController implements GetxService {
   String? get type => _type;
   String? get searchText => _searchText;
 
-
-  Future<void> getCategoryList(bool reload ) async {
-
-    if(_categoryList == null || reload){
+  Future<void> getCategoryList(bool reload) async {
+    if (_categoryList == null || reload) {
       DataSyncHelper.fetchAndSyncData(
-        fetchFromLocal: ()=> categoryRepo.getCategoryList<CacheResponseData>( source: DataSourceEnum.local),
-        fetchFromClient: ()=> categoryRepo.getCategoryList(source: DataSourceEnum.client),
+        fetchFromLocal: () => categoryRepo.getCategoryList<CacheResponseData>(
+          source: DataSourceEnum.local,
+        ),
+        fetchFromClient: () =>
+            categoryRepo.getCategoryList(source: DataSourceEnum.client),
         onResponse: (data, source) {
-
           _categoryList = [];
           data['content']['data'].forEach((category) {
             _categoryList!.add(CategoryModel.fromJson(category));
@@ -49,57 +50,89 @@ class CategoryController extends GetxController implements GetxService {
     }
   }
 
-
-  Future<void> getSubCategoryList(String categoryID, {bool shouldUpdate = true}) async {
+  Future<void> getSubCategoryList(
+    String categoryID, {
+    bool shouldUpdate = true,
+  }) async {
     _subCategoryList = null;
-    if(shouldUpdate){
+    if (shouldUpdate) {
       update();
     }
     Response response = await categoryRepo.getSubCategoryList(categoryID);
-    if (response.statusCode == 200 && response.body['response_code'] == 'default_200') {
-      _subCategoryList= [];
-      response.body['content']['data'].forEach((category) =>
-          _subCategoryList!.addIf(CategoryModel.fromJson(category).isActive , CategoryModel.fromJson(category)));
+    if (response.statusCode == 200 &&
+        response.body['response_code'] == 'default_200') {
+      _subCategoryList = [];
+      response.body['content']['data'].forEach(
+        (category) => _subCategoryList!.addIf(
+          CategoryModel.fromJson(category).isActive,
+          CategoryModel.fromJson(category),
+        ),
+      );
     } else {
-      _subCategoryList= [];
+      _subCategoryList = [];
     }
     update();
   }
 
-  Future<void> getCampaignBasedCategoryList(String campaignID, bool isWithPagination) async {
+  Future<List<CategoryModel>> getChildCategoryList(String categoryID) async {
+    Response response = await categoryRepo.getSubCategoryList(categoryID);
+    if (response.statusCode == 200 &&
+        response.body['response_code'] == 'default_200') {
+      final List<CategoryModel> childCategoryList = [];
+      response.body['content']['data'].forEach((category) {
+        final categoryModel = CategoryModel.fromJson(category);
+        if (categoryModel.isActive == true) {
+          childCategoryList.add(categoryModel);
+        }
+      });
+      return childCategoryList;
+    }
+    return [];
+  }
+
+  Future<void> getCampaignBasedCategoryList(
+    String campaignID,
+    bool isWithPagination,
+  ) async {
     printLog("inside_campaign_based_category !");
-    Response response = await categoryRepo.getItemsBasedOnCampaignId(campaignID: campaignID);
+    Response response = await categoryRepo.getItemsBasedOnCampaignId(
+      campaignID: campaignID,
+    );
 
     if (response.body['response_code'] == 'default_200') {
-      if(!isWithPagination){
+      if (!isWithPagination) {
         _campaignBasedCategoryList = [];
       }
       response.body['content']['data'].forEach((categoryTypesModel) {
-        if(CategoryTypesModel.fromJson(categoryTypesModel).category != null){
-          _campaignBasedCategoryList!.add(CategoryTypesModel.fromJson(categoryTypesModel).category!);
+        if (CategoryTypesModel.fromJson(categoryTypesModel).category != null) {
+          _campaignBasedCategoryList!.add(
+            CategoryTypesModel.fromJson(categoryTypesModel).category!,
+          );
         }
       });
       _isLoading = false;
-      Get.toNamed(RouteHelper.getCategoryRoute('fromCampaign',campaignID));
+      Get.toNamed(RouteHelper.getCategoryRoute('fromCampaign', campaignID));
     } else {
-      if(response.statusCode != 200){
+      if (response.statusCode != 200) {
         ApiChecker.checkApi(response);
-      }else{
-        customSnackBar('campaign_is_not_available_for_this_service'.tr, type: ToasterMessageType.info);
+      } else {
+        customSnackBar(
+          'campaign_is_not_available_for_this_service'.tr,
+          type: ToasterMessageType.info,
+        );
       }
     }
     update();
   }
-
 
   void toggleSearch() {
     _isSearching = !_isSearching!;
     _searchProductList = [];
     update();
   }
+
   void showBottomLoader() {
     _isLoading = true;
     update();
   }
-
 }

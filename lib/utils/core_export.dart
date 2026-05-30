@@ -18,6 +18,7 @@ export 'package:seohost/feature/auth/view/sign_in_screen.dart';
 export 'package:seohost/feature/auth/view/sign_up_screen.dart';
 export 'package:seohost/feature/cart/view/cart_screen.dart';
 export 'package:seohost/feature/category/view/category_subcategory_screen.dart';
+export 'package:seohost/feature/category/view/category_children_screen.dart';
 export 'package:seohost/feature/category/view/category_screen.dart';
 export 'package:seohost/feature/checkout/view/checkout_screen.dart';
 export 'package:seohost/feature/checkout/view/order_successful_screen.dart';
@@ -87,6 +88,7 @@ export 'package:flutter_web_plugins/url_strategy.dart';
 export 'package:seohost/theme/dark_theme.dart';
 export 'package:seohost/theme/light_theme.dart';
 export 'package:seohost/feature/category/model/category_model.dart';
+export 'package:seohost/feature/category/helper/category_navigation_helper.dart';
 export 'package:seohost/helper/price_converter.dart';
 export 'package:seohost/feature/coupon/model/coupon_model.dart';
 export 'package:seohost/feature/home/home_screen.dart';
@@ -428,21 +430,3 @@ export 'package:phone_numbers_parser/phone_numbers_parser.dart';
 export 'package:seohost/api/remote/api_checker.dart';
 export 'package:seohost/feature/html/model/pages_model.dart';
 export 'package:seohost/theme/custom_theme_colors.dart';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -12,22 +12,24 @@ class CategoryModel {
   String? createdAt;
   String? updatedAt;
   int? serviceCount;
+  int? childrenCount;
   GlobalKey? globalKey;
 
-  CategoryModel(
-      {this.id,
-        this.parentId,
-        this.name,
-        this.image,
-        this.imageFullPath,
-        this.position,
-        this.description,
-        this.isActive,
-        this.createdAt,
-        this.updatedAt,
-        this.serviceCount,
-        this.globalKey,
-      });
+  CategoryModel({
+    this.id,
+    this.parentId,
+    this.name,
+    this.image,
+    this.imageFullPath,
+    this.position,
+    this.description,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+    this.serviceCount,
+    this.childrenCount,
+    this.globalKey,
+  });
 
   CategoryModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -41,6 +43,7 @@ class CategoryModel {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     serviceCount = int.tryParse(json['services_count'].toString());
+    childrenCount = int.tryParse(json['children_count'].toString());
     globalKey = GlobalKey(debugLabel: json['id']);
   }
 
@@ -57,6 +60,7 @@ class CategoryModel {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['services_count'] = serviceCount;
+    data['children_count'] = childrenCount;
     return data;
   }
 }

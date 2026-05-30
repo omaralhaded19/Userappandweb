@@ -5,7 +5,6 @@ import 'package:seohost/utils/core_export.dart';
 class AuthController extends GetxController implements GetxService {
   final AuthRepo authRepo;
 
-
   bool _isLoading = false;
   bool _acceptTerms = false;
   bool _forgetPasswordUrlSessionExpired = false;
@@ -28,12 +27,10 @@ class AuthController extends GetxController implements GetxService {
   bool _isWrongOtpSubmitted = false;
   bool get isWrongOtpSubmitted => _isWrongOtpSubmitted;
 
-  LoginMedium  _selectedLoginMedium = LoginMedium.manual;
-  LoginMedium  get selectedLoginMedium => _selectedLoginMedium;
+  LoginMedium _selectedLoginMedium = LoginMedium.manual;
+  LoginMedium get selectedLoginMedium => _selectedLoginMedium;
 
-
-
-  var countryDialCode= "+880";
+  var countryDialCode = "+880";
   final String _mobileNumber = '';
   String get mobileNumber => _mobileNumber;
 
@@ -43,255 +40,379 @@ class AuthController extends GetxController implements GetxService {
   @override
   void onInit() {
     super.onInit();
-    countryDialCode = CountryCode.fromCountryCode(Get.find<SplashController>().configModel.content != null ? Get.find<SplashController>().configModel.content!.countryCode!:"BD").dialCode!;
+    countryDialCode = CountryCode.fromCountryCode(
+      Get.find<SplashController>().configModel.content != null
+          ? Get.find<SplashController>().configModel.content!.countryCode!
+          : "BD",
+    ).dialCode!;
   }
 
   Future<void> registration({required SignUpBody signUpBody}) async {
-
     _isLoading = true;
     update();
 
-      Response response = await authRepo.registration(signUpBody);
-      if (response.statusCode == 200 && response.body['response_code'] == 'registration_200') {
-
-        var config = Get.find<SplashController>().configModel.content;
-        if(config?.phoneVerification == 1 || config?.emailVerification == 1){
-
-          String identity = config?.phoneVerification == 1 ? signUpBody.phone!.trim() : signUpBody.email!.trim();
-          String identityType = config?.phoneVerification == 1 ? "phone" : "email";
-          SendOtpType type = config?.phoneVerification == 1 && config?.firebaseOtpVerification == 1 ? SendOtpType.firebase : SendOtpType.verification;
-          await sendVerificationCode(identity:  identity , identityType: identityType, type: type).then((status){
-            if(status !=null){
-              if(status.isSuccess!){
-                Get.toNamed(RouteHelper.getVerificationRoute(
-                  identity: identity,identityType: identityType,
-                  fromPage: config?.phoneVerification == 1 && config?.firebaseOtpVerification == 1 ? "firebase-otp" : "verification",
-                  firebaseSession: type == SendOtpType.firebase ? status.message : null,
-                ));
-              }else{
-                customSnackBar(status.message.toString().capitalizeFirst);
-              }
+    Response response = await authRepo.registration(signUpBody);
+    if (response.statusCode == 200 &&
+        response.body['response_code'] == 'registration_200') {
+      var config = Get.find<SplashController>().configModel.content;
+      if (config?.phoneVerification == 1 || config?.emailVerification == 1) {
+        String identity = config?.phoneVerification == 1
+            ? signUpBody.phone!.trim()
+            : signUpBody.email!.trim();
+        String identityType = config?.phoneVerification == 1
+            ? "phone"
+            : "email";
+        SendOtpType type =
+            config?.phoneVerification == 1 &&
+                config?.firebaseOtpVerification == 1
+            ? SendOtpType.firebase
+            : SendOtpType.verification;
+        await sendVerificationCode(
+          identity: identity,
+          identityType: identityType,
+          type: type,
+        ).then((status) {
+          if (status != null) {
+            if (status.isSuccess!) {
+              Get.toNamed(
+                RouteHelper.getVerificationRoute(
+                  identity: identity,
+                  identityType: identityType,
+                  fromPage:
+                      config?.phoneVerification == 1 &&
+                          config?.firebaseOtpVerification == 1
+                      ? "firebase-otp"
+                      : "verification",
+                  firebaseSession: type == SendOtpType.firebase
+                      ? status.message
+                      : null,
+                ),
+              );
+            } else {
+              customSnackBar(status.message.toString().capitalizeFirst);
             }
-          });
-
-        }else{
-          await _saveTokenAndNavigate(
-            fromPage: Get.find<LocationController>().getUserAddress() !=null ?  RouteHelper.home : RouteHelper.pickMap,
-            token: response.body['content']['token'], emailPhone: "", password: "",
-          );
-        }
-        customSnackBar('registration_200'.tr,type : ToasterMessageType.success);
+          }
+        });
+      } else {
+        await _saveTokenAndNavigate(
+          fromPage: Get.find<LocationController>().getUserAddress() != null
+              ? RouteHelper.home
+              : RouteHelper.pickMap,
+          token: response.body['content']['token'],
+          emailPhone: "",
+          password: "",
+        );
       }
-      else if(response.statusCode == 404 && response.body['response_code']=="referral_code_400"){
-        customSnackBar("invalid_refer_code".tr);
-      } else if(response.statusCode == 400 && response.body['response_code']=="default_400"){
-        customSnackBar(response.body['errors'][0]['message']);
-      }
-      else {
-        customSnackBar(response.statusText);
-      }
+      customSnackBar('registration_200'.tr, type: ToasterMessageType.success);
+    } else if (response.statusCode == 404 &&
+        response.body['response_code'] == "referral_code_400") {
+      customSnackBar("invalid_refer_code".tr);
+    } else if (response.statusCode == 400 &&
+        response.body['response_code'] == "default_400") {
+      customSnackBar(response.body['errors'][0]['message']);
+    } else {
+      customSnackBar(response.statusText);
+    }
 
     _isLoading = false;
     update();
   }
 
-  Future<void> login({String? fromPage, required String emailPhone, required String password, required String type}) async {
-      _isLoading = true;
-      update();
-      Response? response = await authRepo.login(phone: emailPhone, password: password, type: type);
-      if (response!.statusCode == 200 && response.body['response_code']=="auth_login_200") {
-        await _saveTokenAndNavigate(fromPage: fromPage, token: response.body['content']['token'], emailPhone: emailPhone, password: password);
+  Future<void> login({
+    String? fromPage,
+    required String emailPhone,
+    required String password,
+    required String type,
+  }) async {
+    _isLoading = true;
+    update();
+    Response? response = await authRepo.login(
+      phone: emailPhone,
+      password: password,
+      type: type,
+    );
+    if (response!.statusCode == 200 &&
+        response.body['response_code'] == "auth_login_200") {
+      await _saveTokenAndNavigate(
+        fromPage: fromPage,
+        token: response.body['content']['token'],
+        emailPhone: emailPhone,
+        password: password,
+      );
+    } else if (response.statusCode == 401 &&
+            (response.body["response_code"] == "unverified_phone_401") ||
+        response.body["response_code"] == "unverified_email_401") {
+      var config = Get.find<SplashController>().configModel.content;
 
-      }else if(response.statusCode == 401 && (response.body["response_code"]=="unverified_phone_401") || response.body["response_code"]=="unverified_email_401"){
-
-        var config = Get.find<SplashController>().configModel.content;
-
-        SendOtpType sendOtpType = type == "phone" && config?.firebaseOtpVerification == 1 ? SendOtpType.firebase : SendOtpType.verification;
-        await sendVerificationCode(identity:  emailPhone , identityType: type,type: sendOtpType).then((status){
-          if(status !=null){
-            if(status.isSuccess!){
-              Get.toNamed(RouteHelper.getVerificationRoute(
-                identity: emailPhone,identityType: type,
-                fromPage: type == "phone" && config?.firebaseOtpVerification == 1 ? "firebase-otp" : "verification",
-                firebaseSession: sendOtpType == SendOtpType.firebase ? status.message : null,
-              ));
-            }else{
-              customSnackBar(status.message.toString().capitalizeFirst);
-            }
+      SendOtpType sendOtpType =
+          type == "phone" && config?.firebaseOtpVerification == 1
+          ? SendOtpType.firebase
+          : SendOtpType.verification;
+      await sendVerificationCode(
+        identity: emailPhone,
+        identityType: type,
+        type: sendOtpType,
+      ).then((status) {
+        if (status != null) {
+          if (status.isSuccess!) {
+            Get.toNamed(
+              RouteHelper.getVerificationRoute(
+                identity: emailPhone,
+                identityType: type,
+                fromPage:
+                    type == "phone" && config?.firebaseOtpVerification == 1
+                    ? "firebase-otp"
+                    : "verification",
+                firebaseSession: sendOtpType == SendOtpType.firebase
+                    ? status.message
+                    : null,
+              ),
+            );
+          } else {
+            customSnackBar(status.message.toString().capitalizeFirst);
           }
-        });
-      }
-      else{
-        customSnackBar(response.body["message"].toString().capitalizeFirst??response.statusText);
-      }
-      _isLoading = false;
-      update();
-
+        }
+      });
+    } else {
+      customSnackBar(
+        response.body["message"].toString().capitalizeFirst ??
+            response.statusText,
+      );
+    }
+    _isLoading = false;
+    update();
   }
 
   Future<void> logOut() async {
     Response? response = await authRepo.logOut();
-    if(response?.statusCode == 200){
+    if (response?.statusCode == 200) {
       if (kDebugMode) {
         print("Logout successfully with ${response?.body}");
       }
-    }else{
+    } else {
       if (kDebugMode) {
         print("Logout Failed");
       }
     }
   }
 
-  _saveTokenAndNavigate({String? fromPage, required String token, String? emailPhone, String? password}) async {
-
-    authRepo.saveUserToken(token);
+  _saveTokenAndNavigate({
+    String? fromPage,
+    required String token,
+    String? emailPhone,
+    String? password,
+  }) async {
+    await authRepo.saveUserToken(token);
+    await authRepo.updateToken();
 
     Get.find<SplashController>().updateLanguage(true);
     Get.find<LocationController>().getAddressList();
 
     if (_isActiveRememberMe) {
-      saveUserNumberAndPassword(number : emailPhone ?? "", password : password ?? "", );
+      saveUserNumberAndPassword(
+        number: emailPhone ?? "",
+        password: password ?? "",
+      );
     } else {
       clearUserNumberAndPassword();
     }
-    if( fromPage == null || fromPage == "null"){
+    if (fromPage == null || fromPage == "null") {
       if (Get.find<LocationController>().getUserAddress() != null) {
-
         updateSavedLocalAddress();
 
-        if(fromPage=="booking"){
-         Get.offAllNamed(RouteHelper.getMainRoute('booking'));
-        }else{
+        if (fromPage == "booking") {
+          Get.offAllNamed(RouteHelper.getMainRoute('booking'));
+        } else {
           Get.offAllNamed(RouteHelper.getMainRoute('home'));
         }
       } else {
         Get.offAllNamed(RouteHelper.getAccessLocationRoute('home'));
       }
-    }else{
+    } else {
       Get.offAllNamed(fromPage);
     }
   }
 
   updateSavedLocalAddress({bool saveContactPersonInfo = true}) async {
+    AddressModel addressModel = Get.find<LocationController>()
+        .getUserAddress()!;
 
-    AddressModel addressModel = Get.find<LocationController>().getUserAddress()!;
-
-    if(saveContactPersonInfo){
-      if(Get.find<UserController>().userInfoModel == null){
+    if (saveContactPersonInfo) {
+      if (Get.find<UserController>().userInfoModel == null) {
         Get.find<UserController>().getUserInfo(reload: true);
-      }else{
+      } else {
         String? firstName;
-        if( Get.find<AuthController>().isLoggedIn() && Get.find<UserController>().userInfoModel?.phone!=null && Get.find<UserController>().userInfoModel?.fName !=null){
+        if (Get.find<AuthController>().isLoggedIn() &&
+            Get.find<UserController>().userInfoModel?.phone != null &&
+            Get.find<UserController>().userInfoModel?.fName != null) {
           firstName = "${Get.find<UserController>().userInfoModel?.fName} ";
         }
 
-        addressModel.contactPersonNumber = firstName !=null? Get.find<UserController>().userInfoModel?.phone ?? "" : "";
-        addressModel.contactPersonName = firstName!=null ? "$firstName${Get.find<UserController>().userInfoModel?.lName ?? "" }" : "";
+        addressModel.contactPersonNumber = firstName != null
+            ? Get.find<UserController>().userInfoModel?.phone ?? ""
+            : "";
+        addressModel.contactPersonName = firstName != null
+            ? "$firstName${Get.find<UserController>().userInfoModel?.lName ?? ""}"
+            : "";
         addressModel.addressLabel = 'others';
-
       }
-    }else{
-      addressModel.contactPersonNumber =  "";
-      addressModel.contactPersonName =  "";
+    } else {
+      addressModel.contactPersonNumber = "";
+      addressModel.contactPersonName = "";
     }
     Get.find<LocationController>().saveUserAddress(addressModel);
   }
 
-
-  Future<void> loginWithSocialMedia(SocialLogInBody socialLogInBody ,Function callback,{String? fromPage}) async {
+  Future<void> loginWithSocialMedia(
+    SocialLogInBody socialLogInBody,
+    Function callback, {
+    String? fromPage,
+  }) async {
     _isLoading = true;
     update();
     Response response = await authRepo.loginWithSocialMedia(socialLogInBody);
     _isLoading = false;
-    if (response.statusCode == 200  && response.body['response_code']=="auth_login_200") {
+    if (response.statusCode == 200 &&
+        response.body['response_code'] == "auth_login_200") {
       Map map = response.body;
       String? message = '';
       String? token = '';
       String? tempToken = '';
       String? email;
       UserInfoModel? userInfoModel;
-      try{
+      try {
         message = map['message'] ?? '';
-      }catch(e){
+      } catch (e) {
         debugPrint('error ===> $e');
       }
 
-      try{
+      try {
         token = map['content']['token'];
-      }catch(e){
-
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
       }
-      try{
+      try {
         tempToken = map['content']['temporary_token'];
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
       }
 
-      try{
+      try {
         email = map['content']['email'];
-      }catch(e){
+      } catch (e) {
         if (kDebugMode) {
           print(e);
         }
       }
 
-
-      if(map['content']['user'] != null){
-        try{
+      if (map['content']['user'] != null) {
+        try {
           userInfoModel = UserInfoModel.fromJson(map['content']['user']);
-          callback(true, null, message, null, userInfoModel, socialLogInBody.medium, null, null);
-        }catch(e){
+          callback(
+            true,
+            null,
+            message,
+            null,
+            userInfoModel,
+            socialLogInBody.medium,
+            null,
+            null,
+          );
+        } catch (e) {
           if (kDebugMode) {
             print(e);
           }
         }
       }
 
-      if(token != null){
-        saveUserNumberAndPassword(number : "", password : "", );
+      if (token != null) {
+        saveUserNumberAndPassword(number: "", password: "");
         await authRepo.saveUserToken(token);
         await authRepo.saveUserToken(token);
         await Get.find<UserController>().getUserInfo(reload: true);
         authRepo.updateToken();
-        callback(true, token, message,null, null, null, socialLogInBody.userName, socialLogInBody.email);
+        callback(
+          true,
+          token,
+          message,
+          null,
+          null,
+          null,
+          socialLogInBody.userName,
+          socialLogInBody.email,
+        );
       }
 
-      if(tempToken != null){
-        callback(true, null, message, tempToken, null, null, socialLogInBody.userName, socialLogInBody.email ?? email);
+      if (tempToken != null) {
+        callback(
+          true,
+          null,
+          message,
+          tempToken,
+          null,
+          null,
+          socialLogInBody.userName,
+          socialLogInBody.email ?? email,
+        );
       }
 
       update();
-
-    }else {
+    } else {
       String? errorMessage = response.body['message'] ?? response.statusText;
-      callback(false, '', errorMessage, null, null, null, socialLogInBody.userName, socialLogInBody.email);
+      callback(
+        false,
+        '',
+        errorMessage,
+        null,
+        null,
+        null,
+        socialLogInBody.userName,
+        socialLogInBody.email,
+      );
       update();
     }
   }
 
-
-  Future<ResponseModel?> sendVerificationCode({required String identity, required String identityType,required  SendOtpType type, int checkUser = 1, String fromPage = ""}) async {
+  Future<ResponseModel?> sendVerificationCode({
+    required String identity,
+    required String identityType,
+    required SendOtpType type,
+    int checkUser = 1,
+    String fromPage = "",
+  }) async {
     ResponseModel? responseModel;
-    if(type == SendOtpType.firebase){
-       _sendOtpForFirebaseVerification(identity, identityType, fromPage);
-    } else if(type == SendOtpType.verification){
-      responseModel = await _sendOtpForVerificationScreen(identity: identity, identityType: identityType, checkUser: checkUser);
-    }else{
+    if (type == SendOtpType.firebase) {
+      _sendOtpForFirebaseVerification(identity, identityType, fromPage);
+    } else if (type == SendOtpType.verification) {
+      responseModel = await _sendOtpForVerificationScreen(
+        identity: identity,
+        identityType: identityType,
+        checkUser: checkUser,
+      );
+    } else {
       responseModel = await _sendOtpForForgetPassword(identity, identityType);
     }
     return responseModel;
   }
 
-  Future<ResponseModel> _sendOtpForVerificationScreen({required String identity,required String identityType, required int checkUser}) async {
+  Future<ResponseModel> _sendOtpForVerificationScreen({
+    required String identity,
+    required String identityType,
+    required int checkUser,
+  }) async {
     _isLoading = true;
     update();
-    Response  response = await authRepo.sendOtpForVerificationScreen(identity: identity,identityType: identityType, checkUser: checkUser);
-    if (response.statusCode == 200 && response.body["response_code"]=="default_200") {
+    Response response = await authRepo.sendOtpForVerificationScreen(
+      identity: identity,
+      identityType: identityType,
+      checkUser: checkUser,
+    );
+    if (response.statusCode == 200 &&
+        response.body["response_code"] == "default_200") {
       _isLoading = false;
       update();
       return ResponseModel(true, "");
@@ -299,21 +420,28 @@ class AuthController extends GetxController implements GetxService {
       _isLoading = false;
       update();
       String responseText = "";
-      if(response.statusCode == 500){
+      if (response.statusCode == 500) {
         responseText = "Internal Server Error";
-      }else{
-        responseText = response.body["message"] ?? response.statusText ;
+      } else {
+        responseText = response.body["message"] ?? response.statusText;
       }
       return ResponseModel(false, responseText);
     }
   }
 
-  Future<ResponseModel> _sendOtpForForgetPassword(String identity, String identityType) async {
+  Future<ResponseModel> _sendOtpForForgetPassword(
+    String identity,
+    String identityType,
+  ) async {
     _isLoading = true;
     update();
-    Response response = await authRepo.sendOtpForForgetPassword(identity,identityType);
+    Response response = await authRepo.sendOtpForForgetPassword(
+      identity,
+      identityType,
+    );
 
-    if (response.statusCode == 200 && response.body["response_code"]=="default_200") {
+    if (response.statusCode == 200 &&
+        response.body["response_code"] == "default_200") {
       _isLoading = false;
       update();
       return ResponseModel(true, "");
@@ -321,16 +449,20 @@ class AuthController extends GetxController implements GetxService {
       _isLoading = false;
       update();
       String responseText = "";
-      if(response.statusCode == 500){
+      if (response.statusCode == 500) {
         responseText = "Internal Server Error";
-      }else{
-        responseText = response.body["message"] ?? response.statusText ;
+      } else {
+        responseText = response.body["message"] ?? response.statusText;
       }
       return ResponseModel(false, responseText);
     }
   }
 
-  Future<void> _sendOtpForFirebaseVerification(String identity, String identityType, String fromPage ) async {
+  Future<void> _sendOtpForFirebaseVerification(
+    String identity,
+    String identityType,
+    String fromPage,
+  ) async {
     _isLoading = true;
     update();
 
@@ -340,48 +472,75 @@ class AuthController extends GetxController implements GetxService {
       verificationFailed: (FirebaseAuthException e) {
         _isLoading = false;
         update();
-        if(fromPage == "profile"){
+        if (fromPage == "profile") {
           Get.back();
         }
-        if(e.code == 'invalid-phone-number') {
-          customSnackBar('please_submit_a_valid_phone_number', type: ToasterMessageType.info);
-
-        }else{
+        if (e.code == 'invalid-phone-number') {
+          customSnackBar(
+            'please_submit_a_valid_phone_number',
+            type: ToasterMessageType.info,
+          );
+        } else {
           customSnackBar('${e.message}'.replaceAll('_', ' ').capitalizeFirst);
         }
-
       },
       codeSent: (String vId, int? resendToken) {
         _isLoading = false;
         update();
-        if(fromPage == "profile"){
+        if (fromPage == "profile") {
           Get.back();
         }
-        Get.toNamed(RouteHelper.getVerificationRoute(identity:identity, identityType : identityType, fromPage:  fromPage == "forget-password" ? "forget-password" : "firebase-otp", firebaseSession: vId));
-
+        Get.toNamed(
+          RouteHelper.getVerificationRoute(
+            identity: identity,
+            identityType: identityType,
+            fromPage: fromPage == "forget-password"
+                ? "forget-password"
+                : "firebase-otp",
+            firebaseSession: vId,
+          ),
+        );
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
-
   }
 
-
-  Future<void>  verifyOtpForVerificationScreen(String identity,  String identityType, String otp, String fromPage) async {
+  Future<void> verifyOtpForVerificationScreen(
+    String identity,
+    String identityType,
+    String otp,
+    String fromPage,
+  ) async {
     _isLoading = true;
     update();
-    Response? response = await authRepo.verifyOtpForVerificationScreen(identity,identityType,otp);
+    Response? response = await authRepo.verifyOtpForVerificationScreen(
+      identity,
+      identityType,
+      otp,
+    );
 
-    if (response!.statusCode == 200 && response.body['response_code']=="default_200") {
-      customSnackBar(response.body["message"],type : ToasterMessageType.success);
-      if(fromPage == "profile"){
+    if (response!.statusCode == 200 &&
+        response.body['response_code'] == "default_200") {
+      customSnackBar(
+        response.body["message"],
+        type: ToasterMessageType.success,
+      );
+      if (fromPage == "profile") {
         Get.find<UserController>().getUserInfo(reload: false);
-        if(Navigator.canPop(Get.context!)){
+        if (Navigator.canPop(Get.context!)) {
           Navigator.pop(Get.context!);
-        }else{
+        } else {
           Get.toNamed(RouteHelper.getEditProfileRoute());
         }
-      }else{
-        await _saveTokenAndNavigate(  fromPage: Get.find<LocationController>().getUserAddress() !=null ?  RouteHelper.home : RouteHelper.pickMap, token: response.body['content']['token'], emailPhone: "", password: "");
+      } else {
+        await _saveTokenAndNavigate(
+          fromPage: Get.find<LocationController>().getUserAddress() != null
+              ? RouteHelper.home
+              : RouteHelper.pickMap,
+          token: response.body['content']['token'],
+          emailPhone: "",
+          password: "",
+        );
       }
     } else {
       ResponseModel responseModel = _checkWrongOtp(response);
@@ -389,59 +548,69 @@ class AuthController extends GetxController implements GetxService {
     }
     _isLoading = false;
     update();
-
   }
 
-
-  Future<ResponseModel> verifyOtpForForgetPasswordScreen(String identity, String identityType, String otp, {bool fromOutsideUrl = false , bool shouldUpdate = true}) async {
-
+  Future<ResponseModel> verifyOtpForForgetPasswordScreen(
+    String identity,
+    String identityType,
+    String otp, {
+    bool fromOutsideUrl = false,
+    bool shouldUpdate = true,
+  }) async {
     _isLoading = true;
 
-    if(fromOutsideUrl){
+    if (fromOutsideUrl) {
       _forgetPasswordUrlSessionExpired = true;
     }
 
-    if(shouldUpdate){
+    if (shouldUpdate) {
       update();
     }
 
-    Response response = await authRepo.verifyOtpForForgetPassword(identity, identityType, otp);
+    Response response = await authRepo.verifyOtpForForgetPassword(
+      identity,
+      identityType,
+      otp,
+    );
 
-    if (response.statusCode==200 &&  response.body['response_code'] == 'default_200') {
+    if (response.statusCode == 200 &&
+        response.body['response_code'] == 'default_200') {
       _isLoading = false;
       _forgetPasswordUrlSessionExpired = false;
       update();
       return ResponseModel(true, "successfully_verified");
-    }else{
+    } else {
       _isLoading = false;
       update();
       String responseText = "";
-      if(response.statusCode == 500){
+      if (response.statusCode == 500) {
         responseText = "Internal Server Error";
-      }else if(response.statusCode == 400 && response.body['errors'] !=null ){
+      } else if (response.statusCode == 400 &&
+          response.body['errors'] != null) {
         responseText = response.body['errors'][0]['message'];
-      }else{
-        responseText = response.body["message"] ?? response.statusText ;
+      } else {
+        responseText = response.body["message"] ?? response.statusText;
       }
       return ResponseModel(false, responseText);
     }
-
   }
 
-
-  Future<void>  verifyOtpForPhoneOtpLogin(String phone, String otp,) async {
+  Future<void> verifyOtpForPhoneOtpLogin(String phone, String otp) async {
     _isLoading = true;
     update();
-    Response? response = await authRepo.verifyOtpForPhoneOtpLogin(phone,otp);
+    Response? response = await authRepo.verifyOtpForPhoneOtpLogin(phone, otp);
 
     if (response!.statusCode == 200) {
-
-      if(response.body['content']['token'] !=null){
-       await _saveTokenAndNavigate( fromPage : RouteHelper.getMainRoute("home"), token: response.body['content']['token'], emailPhone: phone, password: "");
-      } else if(response.body['content']['temporary_token'] !=null){
+      if (response.body['content']['token'] != null) {
+        await _saveTokenAndNavigate(
+          fromPage: RouteHelper.getMainRoute("home"),
+          token: response.body['content']['token'],
+          emailPhone: phone,
+          password: "",
+        );
+      } else if (response.body['content']['temporary_token'] != null) {
         Get.offNamed(RouteHelper.getUpdateProfileRoute(phone: phone));
       }
-
     } else {
       ResponseModel responseModel = _checkWrongOtp(response);
       customSnackBar(responseModel.message ?? "");
@@ -450,29 +619,46 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-
-  Future<void>  verifyOtpForFirebaseOtp({String? session, String? phone, String? code , required String fromPage}) async {
+  Future<void> verifyOtpForFirebaseOtp({
+    String? session,
+    String? phone,
+    String? code,
+    required String fromPage,
+  }) async {
     _isLoading = true;
     update();
-    Response? response = await authRepo.verifyOtpForFirebaseOtpLogin(session: session, phone: phone, code: code);
+    Response? response = await authRepo.verifyOtpForFirebaseOtpLogin(
+      session: session,
+      phone: phone,
+      code: code,
+    );
 
     if (response!.statusCode == 200) {
-      if(fromPage == "forget-password"){
-        Get.offNamed(RouteHelper.getChangePasswordRoute(body: ForgetPasswordBody(
-          identity: phone,
-          identityType: "phone",
-          otp: code,
-          fromUrl: 0,
-          isFirebaseOtp: 1
-        )));
-      }else{
-        if(response.body['content']['token'] !=null){
-          await _saveTokenAndNavigate(   fromPage: Get.find<LocationController>().getUserAddress() !=null ?  RouteHelper.home : RouteHelper.pickMap, token: response.body['content']['token'], emailPhone: phone);
-        } else if(response.body['content']['temporary_token'] !=null){
-          Get.offNamed(RouteHelper.getUpdateProfileRoute(phone: phone ??""));
+      if (fromPage == "forget-password") {
+        Get.offNamed(
+          RouteHelper.getChangePasswordRoute(
+            body: ForgetPasswordBody(
+              identity: phone,
+              identityType: "phone",
+              otp: code,
+              fromUrl: 0,
+              isFirebaseOtp: 1,
+            ),
+          ),
+        );
+      } else {
+        if (response.body['content']['token'] != null) {
+          await _saveTokenAndNavigate(
+            fromPage: Get.find<LocationController>().getUserAddress() != null
+                ? RouteHelper.home
+                : RouteHelper.pickMap,
+            token: response.body['content']['token'],
+            emailPhone: phone,
+          );
+        } else if (response.body['content']['temporary_token'] != null) {
+          Get.offNamed(RouteHelper.getUpdateProfileRoute(phone: phone ?? ""));
         }
       }
-
     } else {
       ResponseModel responseModel = _checkWrongOtp(response);
       customSnackBar(responseModel.message);
@@ -481,18 +667,33 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-
-  Future<void>  updateNewUserProfileAndLogin({String? firstName, String? lastName, String? phone, String? email}) async {
+  Future<void> updateNewUserProfileAndLogin({
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? email,
+  }) async {
     _isLoading = true;
     update();
 
-    Response response = await authRepo.updateNewUserProfileAndLogin(firstName: firstName, lastName: lastName, phone: phone, email: email);
+    Response response = await authRepo.updateNewUserProfileAndLogin(
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone,
+      email: email,
+    );
 
     if (response.statusCode == 200) {
-      if(response.body['content']['token'] !=null){
-        await _saveTokenAndNavigate( fromPage: Get.find<LocationController>().getUserAddress() !=null ?  RouteHelper.home : RouteHelper.pickMap, token: response.body['content']['token'], emailPhone: phone, password: "");
+      if (response.body['content']['token'] != null) {
+        await _saveTokenAndNavigate(
+          fromPage: Get.find<LocationController>().getUserAddress() != null
+              ? RouteHelper.home
+              : RouteHelper.pickMap,
+          token: response.body['content']['token'],
+          emailPhone: phone,
+          password: "",
+        );
       }
-
     } else {
       ApiChecker.checkApi(response);
     }
@@ -500,28 +701,57 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> registerWithSocialMedia ({String? firstName, String? lastName, String? phone, String? email}) async{
+  Future<void> registerWithSocialMedia({
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? email,
+  }) async {
     _isLoading = true;
     update();
-    Response response = await authRepo.registerWithSocialMedia(firstName: firstName, lastName: lastName, phone: phone, email: email);
+    Response response = await authRepo.registerWithSocialMedia(
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone,
+      email: email,
+    );
 
     if (response.statusCode == 200) {
-      if(response.body['content']['token'] !=null){
-        await _saveTokenAndNavigate(fromPage: Get.find<LocationController>().getUserAddress() !=null ?  RouteHelper.home : RouteHelper.pickMap, token: response.body['content']['token'], emailPhone: "", password: "");
-      }
-      else if(response.body['content']['temporary_token'] != null){
+      if (response.body['content']['token'] != null) {
+        await _saveTokenAndNavigate(
+          fromPage: Get.find<LocationController>().getUserAddress() != null
+              ? RouteHelper.home
+              : RouteHelper.pickMap,
+          token: response.body['content']['token'],
+          emailPhone: "",
+          password: "",
+        );
+      } else if (response.body['content']['temporary_token'] != null) {
         var config = Get.find<SplashController>().configModel.content;
-        SendOtpType  type = config?.firebaseOtpVerification == 1 ? SendOtpType.firebase : SendOtpType.verification;
+        SendOtpType type = config?.firebaseOtpVerification == 1
+            ? SendOtpType.firebase
+            : SendOtpType.verification;
 
-        await sendVerificationCode(identity: phone!, identityType: "phone", type: type).then((status){
-          if(status !=null){
-            if(status.isSuccess!){
-              Get.toNamed(RouteHelper.getVerificationRoute(
-                identity: phone,identityType: "phone",
-                fromPage: type == SendOtpType.firebase ? "firebase-otp" : "otp-login",
-                firebaseSession: type == SendOtpType.firebase ? status.message : null
-              ));
-            }else{
+        await sendVerificationCode(
+          identity: phone!,
+          identityType: "phone",
+          type: type,
+        ).then((status) {
+          if (status != null) {
+            if (status.isSuccess!) {
+              Get.toNamed(
+                RouteHelper.getVerificationRoute(
+                  identity: phone,
+                  identityType: "phone",
+                  fromPage: type == SendOtpType.firebase
+                      ? "firebase-otp"
+                      : "otp-login",
+                  firebaseSession: type == SendOtpType.firebase
+                      ? status.message
+                      : null,
+                ),
+              );
+            } else {
               customSnackBar(status.message.toString().capitalizeFirst);
             }
           }
@@ -534,38 +764,34 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-
-  Future<void> existingAccountCheck ({String? email, required int userResponse, required String medium}) async{
+  Future<void> existingAccountCheck({
+    String? email,
+    required int userResponse,
+    required String medium,
+  }) async {
     _isLoading = true;
     update();
-    Response response = await authRepo.existingAccountCheck(email: email ?? "", userResponse: userResponse, medium: medium);
+    Response response = await authRepo.existingAccountCheck(
+      email: email ?? "",
+      userResponse: userResponse,
+      medium: medium,
+    );
     if (response.statusCode == 200) {
-
-      if(response.body['content']['token'] !=null){
-       await _saveTokenAndNavigate(  fromPage: Get.find<LocationController>().getUserAddress() !=null ?  RouteHelper.home : RouteHelper.pickMap, token: response.body['content']['token']);
-      }else if(response.body['content']['temporary_token'] !=null){
-        Get.offNamed(RouteHelper.getUpdateProfileRoute(email: email ??"", tempToken: response.body['content']['temporary_token']));
+      if (response.body['content']['token'] != null) {
+        await _saveTokenAndNavigate(
+          fromPage: Get.find<LocationController>().getUserAddress() != null
+              ? RouteHelper.home
+              : RouteHelper.pickMap,
+          token: response.body['content']['token'],
+        );
+      } else if (response.body['content']['temporary_token'] != null) {
+        Get.offNamed(
+          RouteHelper.getUpdateProfileRoute(
+            email: email ?? "",
+            tempToken: response.body['content']['temporary_token'],
+          ),
+        );
       }
-
-    } else {
-     ApiChecker.checkApi(response);
-    }
-    _isLoading= false;
-    update();
-  }
-
-
-
-
-
-  Future<void> resetPassword(String identity,String identityType, String otp, String password, String confirmPassword, int isFirebaseOtp) async {
-    _isLoading = true;
-    update();
-    Response? response = await authRepo.resetPassword(identity,identityType, otp, password, confirmPassword, isFirebaseOtp);
-
-    if (response!.statusCode == 200 && response.body['response_code']=="default_password_reset_200") {
-      Get.offNamed(RouteHelper.getSignInRoute());
-      customSnackBar('password_changed_successfully'.tr,type : ToasterMessageType.success);
     } else {
       ApiChecker.checkApi(response);
     }
@@ -573,20 +799,51 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
+  Future<void> resetPassword(
+    String identity,
+    String identityType,
+    String otp,
+    String password,
+    String confirmPassword,
+    int isFirebaseOtp,
+  ) async {
+    _isLoading = true;
+    update();
+    Response? response = await authRepo.resetPassword(
+      identity,
+      identityType,
+      otp,
+      password,
+      confirmPassword,
+      isFirebaseOtp,
+    );
 
-  ResponseModel _checkWrongOtp (Response response){
-    if (verificationCode.length == 6 && response.statusCode == 403){
+    if (response!.statusCode == 200 &&
+        response.body['response_code'] == "default_password_reset_200") {
+      Get.offNamed(RouteHelper.getSignInRoute());
+      customSnackBar(
+        'password_changed_successfully'.tr,
+        type: ToasterMessageType.success,
+      );
+    } else {
+      ApiChecker.checkApi(response);
+    }
+    _isLoading = false;
+    update();
+  }
+
+  ResponseModel _checkWrongOtp(Response response) {
+    if (verificationCode.length == 6 && response.statusCode == 403) {
       _isWrongOtpSubmitted = true;
     }
     String responseText = "";
-    if(response.statusCode == 500){
+    if (response.statusCode == 500) {
       responseText = "Internal Server Error";
-    }else{
-      responseText = response.body["message"] ?? "verification_failed".tr ;
+    } else {
+      responseText = response.body["message"] ?? "verification_failed".tr;
     }
     return ResponseModel(false, responseText);
   }
-
 
   void updateVerificationCode(String query) {
     _verificationCode = query;
@@ -594,70 +851,72 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-  void updateForgetPasswordUrlSessionExpiredStatus({required bool status, bool shouldUpdate = false}){
+  void updateForgetPasswordUrlSessionExpiredStatus({
+    required bool status,
+    bool shouldUpdate = false,
+  }) {
     _forgetPasswordUrlSessionExpired = status;
-    if(shouldUpdate){
+    if (shouldUpdate) {
       update();
     }
   }
 
-
-  void toggleTerms({bool? value , bool shouldUpdate = true}) {
-    if(value != null){
+  void toggleTerms({bool? value, bool shouldUpdate = true}) {
+    if (value != null) {
       _acceptTerms = value;
-    }else{
+    } else {
       _acceptTerms = !_acceptTerms;
     }
-    if(shouldUpdate){
+    if (shouldUpdate) {
       update();
     }
   }
 
-  toggleIsNumberLogin ({bool? value, bool isUpdate = true}){
-    if(value == null){
+  toggleIsNumberLogin({bool? value, bool isUpdate = true}) {
+    if (value == null) {
       _isNumberLogin = !_isNumberLogin;
-    }else{
+    } else {
       _isNumberLogin = value;
     }
     initCountryCode();
-    if(isUpdate){
+    if (isUpdate) {
       update();
     }
   }
 
-  toggleSelectedLoginMedium ({required LoginMedium loginMedium, bool isUpdate = true}){
+  toggleSelectedLoginMedium({
+    required LoginMedium loginMedium,
+    bool isUpdate = true,
+  }) {
     _selectedLoginMedium = loginMedium;
-    if(isUpdate){
+    if (isUpdate) {
       update();
     }
   }
 
-
-  void cancelTermsAndCondition(){
+  void cancelTermsAndCondition() {
     _acceptTerms = false;
   }
 
   void toggleRememberMe({bool? value, bool shouldUpdate = true}) {
-
-    if(value != null){
+    if (value != null) {
       _isActiveRememberMe = value;
-    }else{
+    } else {
       _isActiveRememberMe = !_isActiveRememberMe;
     }
-    if(shouldUpdate){
+    if (shouldUpdate) {
       update();
     }
   }
 
-  void toggleReferralBottomSheetShow (){
+  void toggleReferralBottomSheetShow() {
     authRepo.toggleReferralBottomSheetShow(false);
     update();
   }
 
-  bool getIsShowReferralBottomSheet (){
+  bool getIsShowReferralBottomSheet() {
     return authRepo.getIsShowReferralBottomSheet();
   }
-
 
   bool isLoggedIn() => authRepo.isLoggedIn();
   String getUserNumber() => authRepo.getUserNumber();
@@ -665,46 +924,80 @@ class AuthController extends GetxController implements GetxService {
   String getUserPassword() => authRepo.getUserPassword();
   bool isNotificationActive() => authRepo.isNotificationActive();
 
-  void saveUserNumberAndPassword({ required String number, required String password}) =>
-      authRepo.saveUserNumberAndPassword(number, password, countryDialCode);
-  Future<bool> clearUserNumberAndPassword() async => authRepo.clearUserNumberAndPassword();
+  void saveUserNumberAndPassword({
+    required String number,
+    required String password,
+  }) => authRepo.saveUserNumberAndPassword(number, password, countryDialCode);
+  Future<bool> clearUserNumberAndPassword() async =>
+      authRepo.clearUserNumberAndPassword();
 
-  bool clearSharedData({Response? response}) => authRepo.clearSharedData(response: response);
+  bool clearSharedData({Response? response}) =>
+      authRepo.clearSharedData(response: response);
   String getUserToken() => authRepo.getUserToken();
 
-
-  toggleNotificationSound(){
+  toggleNotificationSound() {
     authRepo.toggleNotificationSound(!isNotificationActive());
     update();
   }
 
-
-
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId:
+        '766014068058-rmelktotr7j1il8pnaspo7rhk1cqh6qp.apps.googleusercontent.com',
+    scopes: const ['email', 'profile'],
+  );
 
   GoogleSignInAccount? googleAccount;
   GoogleSignInAuthentication? auth;
 
-  Future<void> socialLogin() async {
-    googleAccount = (await _googleSignIn.signIn());
-    auth = await googleAccount?.authentication;
-    update();
+  Future<bool> socialLogin() async {
+    try {
+      await _googleSignIn.signOut();
+      googleAccount = await _googleSignIn.signIn();
+      if (googleAccount == null) {
+        update();
+        return false;
+      }
+
+      auth = await googleAccount!.authentication;
+      if (auth?.accessToken == null && auth?.idToken == null) {
+        customSnackBar('Google sign-in failed');
+        update();
+        return false;
+      }
+
+      update();
+      return true;
+    } on PlatformException catch (e) {
+      final String errorDetails =
+          'Google sign-in failed: ${e.code} ${e.message ?? ''} ${e.details ?? ''}';
+      debugPrint(errorDetails);
+      customSnackBar(errorDetails);
+      customSnackBar(
+        e.code == 'sign_in_failed'
+            ? 'تعذر تسجيل الدخول بواسطة Google. تحقق من إعدادات Firebase و Google Play Services'
+            : 'Google sign-in failed: ${e.code}',
+      );
+      update();
+      return false;
+    } catch (e) {
+      debugPrint('Google sign-in failed: $e');
+      customSnackBar('Google sign-in failed');
+      update();
+      return false;
+    }
   }
 
-
-
   Future<void> googleLogout() async {
-    try{
-      googleAccount = (await _googleSignIn.disconnect())!;
-      auth = await googleAccount!.authentication;
-    }catch(e){
+    try {
+      await _googleSignIn.signOut();
+      googleAccount = null;
+      auth = null;
+    } catch (e) {
       if (kDebugMode) {
         print("");
       }
     }
   }
-
 
   Future<void> signOutWithFacebook() async {
     await FacebookAuth.instance.logOut();
@@ -719,7 +1012,12 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-  void initCountryCode({String? countryCode}){
-    countryDialCode = countryCode ?? CountryCode.fromCountryCode(Get.find<SplashController>().configModel.content?.countryCode ?? "BD").dialCode ?? "+880";
+  void initCountryCode({String? countryCode}) {
+    countryDialCode =
+        countryCode ??
+        CountryCode.fromCountryCode(
+          Get.find<SplashController>().configModel.content?.countryCode ?? "BD",
+        ).dialCode ??
+        "+880";
   }
 }

@@ -2,17 +2,17 @@
 <html lang="en-US">
 <head>
   <base href="/">
-  <meta name="google-signin-client_id" content="766014068058-vvltmmm10lm9pc762h9v8an6p84qabec.apps.googleusercontent.com">
+  <meta name="google-signin-client_id" content="766014068058-rmelktotr7j1il8pnaspo7rhk1cqh6qp.apps.googleusercontent.com">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A multi-vendor service providing app.">
   <meta name="robots" content="nofollow, noindex, max-snippet:1, max-video-preview:1, max-image-preview:standard">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="مؤسسة الرفايعة للخدمات المنزلية">
+  <meta name="apple-mobile-web-app-title" content="قدها - للخدمات المنزلية">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="icon" type="image/png" href="favicon.png"/>
-  <title>مؤسسة الرفايعة للخدمات المنزلية</title>
+  <title>قدها - للخدمات المنزلية</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" type="text/css" href="style.css">
   <script type="application/javascript" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" defer></script>
@@ -54,7 +54,7 @@
   <script src="flutter.js?version=3.3" defer></script>
 </head>
 <body>
-<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAM0lUMDPBpS8v0-Z8s80rp626M4we3Iv8-MHjY&loading=async&callback=Function.prototype"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWz4-jZ4bbOmoGS-0rZ3xtYAaItEnFH5g&loading=async&callback=Function.prototype"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
   <div class="preloader">
@@ -145,18 +145,17 @@
       }
   </script>
   <script>
-    import { initializeApp } from "firebase/app";
-    import { getAnalytics } from "firebase/analytics";
     const firebaseConfig = {
-      apiKey: "AIzaSyByFcLBKAppS9mf7Ta_5QcrbKY8Pd8NzF4",
+      apiKey: "AIzaSyB8ZAFd5Sr9DpXS1mYZVvM33wN6ZWpnCGQ",
       authDomain: "alrafayah2026-a9c37.firebaseapp.com",
       projectId: "alrafayah2026-a9c37",
       storageBucket: "alrafayah2026-a9c37.firebasestorage.app",
       messagingSenderId: "766014068058",
-      appId: "1:766014068058:web:e5c89479370d3397504f63"
+      appId: "1:766014068058:android:e5f19e86455dd6a2504f63"
     };
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
   </script>
 </body>
 </html>

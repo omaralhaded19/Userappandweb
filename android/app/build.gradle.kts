@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 val keystoreProperties = Properties()
@@ -15,6 +16,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.alrafayah.shooping"
     compileSdk = 36
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         multiDexEnabled = true
@@ -46,8 +48,13 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("release")
+        }
         getByName("release") {
-            signingConfig = signingConfigs.getByName("debug") // or "release" if you have real keystore
+            signingConfig = signingConfigs.getByName("release") // or "release" if you have real keystore
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

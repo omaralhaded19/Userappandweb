@@ -2,6 +2,7 @@
     package="com.alrafayah.shooping">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
@@ -24,16 +25,14 @@
     </queries>
 
     <application
-        android:label="مؤسسة الرفايعة للخدمات المنزلية"
+        android:label="قدها - للخدمات المنزلية"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher">
-        android:requestLegacyExternalStorage="true"
-
 
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAM0lUMDPBpS8v0-Z8s80rp626M4we3Iv8"/>
+            android:value="AIzaSyCWz4-jZ4bbOmoGS-0rZ3xtYAaItEnFH5g"/>
 
         <provider
             android:name="com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFileProvider"
@@ -75,7 +74,7 @@
                 />
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
-                android:value="seohostWithoutsound" />
+                android:value="seohost" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -99,8 +98,8 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="seohost-web.6amtech.com" android:scheme="http"/>
-                <data android:host="seohost-web.6amtech.com" android:scheme="https"/>
+                <data android:host="alrafayah.com" android:scheme="http"/>
+                <data android:host="alrafayah.com" android:scheme="https"/>
             </intent-filter>
 
         </activity>

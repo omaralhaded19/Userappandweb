@@ -1,7 +1,7 @@
 name: seohost
 description: A new Flutter application.
 publish_to: 'none'
-version: 1.0.8+0
+version: 6.0.3+81
 
 environment:
   sdk: ^3.8.1

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>مؤسسة الرفايعة للخدمات المنزلية</string>
+	<string>قدها - للخدمات المنزلية</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>مؤسسة الرفايعة للخدمات المنزلية</string>
+	<string>قدها - للخدمات المنزلية</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,7 +29,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.889759666168-911s1afh1bslps3p90cm3j9au54l0crd</string>
+				<string>com.googleusercontent.apps.766014068058-i5hl3oh8ubj38bmvb1b3nmqu2j0ncc5q</string>
 			</array>
 		</dict>
 		<dict>
@@ -46,7 +46,7 @@
 	<key>FacebookClientToken</key>
 	<string>YOUR_FACEBOOK_CLIENT_TOKEN</string>
 	<key>FacebookDisplayName</key>
-	<string>مؤسسة الرفايعة للخدمات المنزلية</string>
+	<string>قدها - للخدمات المنزلية</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>

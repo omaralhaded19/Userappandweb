@@ -85,9 +85,9 @@ class LocationController extends GetxController implements GetxService {
       }else if(defaultLatLng !=null){
 
         myPosition =  Position(
-          latitude:defaultLatLng.latitude,
-          longitude:defaultLatLng.longitude,
-          timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,
+            latitude:defaultLatLng.latitude,
+            longitude:defaultLatLng.longitude,
+            timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,
             altitudeAccuracy: 1, headingAccuracy: 1
         );
       }else{
@@ -96,15 +96,15 @@ class LocationController extends GetxController implements GetxService {
     }catch(e) {
       if(defaultLatLng != null){
         myPosition = Position(
-          latitude:defaultLatLng.latitude,
-          longitude:defaultLatLng.longitude,
-          timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,  altitudeAccuracy: 1, headingAccuracy: 1
+            latitude:defaultLatLng.latitude,
+            longitude:defaultLatLng.longitude,
+            timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,  altitudeAccuracy: 1, headingAccuracy: 1
         );
       }else{
         myPosition = Position(
-          latitude:  Get.find<SplashController>().configModel.content?.defaultLocation?.latitude ?? 23.0000,
-          longitude: Get.find<SplashController>().configModel.content?.defaultLocation?.longitude ?? 90.0000,
-          timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,  altitudeAccuracy: 1, headingAccuracy: 1
+            latitude:  Get.find<SplashController>().configModel.content?.defaultLocation?.latitude ?? 23.0000,
+            longitude: Get.find<SplashController>().configModel.content?.defaultLocation?.longitude ?? 90.0000,
+            timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,  altitudeAccuracy: 1, headingAccuracy: 1
         );
       }
 
@@ -141,16 +141,16 @@ class LocationController extends GetxController implements GetxService {
       firstName = "${Get.find<UserController>().userInfoModel?.fName} ";
     }
     addressModel = AddressModel(
-      latitude: myPosition.latitude.toString(), longitude: myPosition.longitude.toString(), addressType: 'others',
-      zoneId: responseModel.isSuccess ? responseModel.zoneIds : '',
-      address: address.address ?? "",
-      country: address.country ?? "",
-      house: address.house ?? "",
-      street: address.street ?? "",
-      city: address.city ?? "",
-      zipCode: address.zipCode ?? "",
-      addressLabel: AddressLabel.home.name,
-      availableServiceCountInZone: responseModel.totalServiceCount,
+        latitude: myPosition.latitude.toString(), longitude: myPosition.longitude.toString(), addressType: 'others',
+        zoneId: responseModel.isSuccess ? responseModel.zoneIds : '',
+        address: address.address ?? "",
+        country: address.country ?? "",
+        house: address.house ?? "",
+        street: address.street ?? "",
+        city: address.city ?? "",
+        zipCode: address.zipCode ?? "",
+        addressLabel: AddressLabel.home.name,
+        availableServiceCountInZone: responseModel.totalServiceCount,
         contactPersonNumber: firstName !=null? Get.find<UserController>().userInfoModel?.phone ?? "" : "",
         contactPersonName: firstName!=null ? "$firstName${Get.find<UserController>().userInfoModel?.lName ?? "" }" : ""
     );
@@ -162,30 +162,74 @@ class LocationController extends GetxController implements GetxService {
   }
 
   Future<ZoneResponseModel> getZone(String lat, String long, bool markerLoad, {bool isLoading = false}) async {
-    
-    if(!isLoading){
+    if (!isLoading) {
       _isLoading = true;
     }
     update();
+
     ZoneResponseModel responseModel;
-    Response response = await locationRepo.getZone(lat, long);
+    final Response response = await locationRepo.getZone(lat, long);
 
-    int totalServiceCountInZone = 0;
-    if(response.statusCode == 200 && response.body['content'] != null) {
-      _inZone = true;
-      _zoneID = response.body['content']['zone']['id'];
-
-      if(response.body['content']['available_services_count'] !=null){
-        totalServiceCountInZone = int.tryParse(response.body['content']['available_services_count'].toString()) ?? 0;
+    // بعض السيرفرات قد ترجع HTML (Cloudflare/nginx) بدل JSON، لذلك نعمل parse آمن.
+    Map<String, dynamic>? asMap(dynamic body) {
+      if (body == null) return null;
+      if (body is Map<String, dynamic>) return body;
+      if (body is Map) return body.map((k, v) => MapEntry(k.toString(), v));
+      if (body is String) {
+        final s = body.trim();
+        if (s.startsWith('{') || s.startsWith('[')) {
+          try {
+            final decoded = jsonDecode(s);
+            if (decoded is Map) {
+              return decoded.map((k, v) => MapEntry(k.toString(), v));
+            }
+          } catch (_) {}
+        }
       }
-      responseModel = ZoneResponseModel(true, '',_zoneID, totalServiceCountInZone);
-    }else {
-      _inZone = false;
-      responseModel = ZoneResponseModel(false, response.body['message'], '',totalServiceCountInZone);
+      return null;
     }
-    if(!isLoading){
+
+    final Map<String, dynamic>? bodyMap = asMap(response.body);
+    int totalServiceCountInZone = 0;
+
+    try {
+      final content = bodyMap?['content'];
+      if (response.statusCode == 200 && content is Map) {
+        _inZone = true;
+
+        final zone = content['zone'];
+        _zoneID = (zone is Map ? zone['id'] : null)?.toString() ?? '';
+
+        final available = content['available_services_count'];
+        if (available != null) {
+          totalServiceCountInZone = int.tryParse(available.toString()) ?? 0;
+        }
+
+        responseModel = ZoneResponseModel(true, '', _zoneID, totalServiceCountInZone);
+      } else {
+        _inZone = false;
+
+        String msg = 'تعذر تحديد المنطقة';
+        if (bodyMap?['message'] != null) {
+          msg = bodyMap!['message'].toString();
+        } else if (response.body is String) {
+          final t = response.body.toString();
+          if (t.contains('Checking your browser') || t.contains('cf-browser-verification')) {
+            msg = 'تم حظر الطلب بواسطة حماية المتصفح (Cloudflare/WAF). لازم استثناء مسارات API من التحدي.';
+          } else if (t.contains('405 Not Allowed')) {
+            msg = '405 Method Not Allowed: تأكد من رابط الـ API والـ HTTP Method لهذا الـ endpoint.';
+          }
+        }
+
+        responseModel = ZoneResponseModel(false, msg, '', totalServiceCountInZone);
+      }
+    } catch (_) {
+      _inZone = false;
+      responseModel = ZoneResponseModel(false, 'استجابة غير متوقعة من السيرفر', '', totalServiceCountInZone);
+    }
+
+    if (!isLoading) {
       _isLoading = false;
-      
     }
     update();
     return responseModel;
@@ -198,14 +242,14 @@ class LocationController extends GetxController implements GetxService {
       try {
         if (fromAddress) {
           _position = Position(
-            latitude: position.target.latitude, longitude: position.target.longitude, timestamp: DateTime.now(),
-            heading: 1, accuracy: 1, altitude: 1, speedAccuracy: 1, speed: 1,
+              latitude: position.target.latitude, longitude: position.target.longitude, timestamp: DateTime.now(),
+              heading: 1, accuracy: 1, altitude: 1, speedAccuracy: 1, speed: 1,
               altitudeAccuracy: 1, headingAccuracy: 1
           );
         } else {
           _pickPosition = Position(
-            latitude: position.target.latitude, longitude: position.target.longitude, timestamp: DateTime.now(),
-            heading: 1, accuracy: 1, altitude: 1, speedAccuracy: 1, speed: 1,
+              latitude: position.target.latitude, longitude: position.target.longitude, timestamp: DateTime.now(),
+              heading: 1, accuracy: 1, altitude: 1, speedAccuracy: 1, speed: 1,
               altitudeAccuracy: 1, headingAccuracy: 1
           );
         }
@@ -281,7 +325,7 @@ class LocationController extends GetxController implements GetxService {
         }
       }
     }
-   // _isLoading = false;
+    // _isLoading = false;
 
     update();
   }
@@ -447,8 +491,8 @@ class LocationController extends GetxController implements GetxService {
     }
 
     _pickPosition = Position(
-      latitude: latLng.latitude, longitude: latLng.longitude,
-      timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,
+        latitude: latLng.latitude, longitude: latLng.longitude,
+        timestamp: DateTime.now(), accuracy: 1, altitude: 1, heading: 1, speed: 1, speedAccuracy: 1,
         altitudeAccuracy: 1, headingAccuracy: 1
     );
 
@@ -478,8 +522,8 @@ class LocationController extends GetxController implements GetxService {
 
   void setUpdateAddress(AddressModel address){
     _position = Position(
-      latitude: double.parse(address.latitude!), longitude: double.parse(address.longitude!), timestamp: DateTime.now(),
-      altitude: 1, heading: 1, speed: 1, speedAccuracy: 1, floor: 1, accuracy: 1,
+        latitude: double.parse(address.latitude!), longitude: double.parse(address.longitude!), timestamp: DateTime.now(),
+        altitude: 1, heading: 1, speed: 1, speedAccuracy: 1, floor: 1, accuracy: 1,
         altitudeAccuracy: 1, headingAccuracy: 1
     );
     _address.address = address.address!;
@@ -551,7 +595,7 @@ class LocationController extends GetxController implements GetxService {
     Response response = await locationRepo.getAddressFromGeocode(latLng);
     AddressFormat addressFormat;
     AddressModel address = AddressModel(
-      address: 'Unknown Location Found'
+        address: 'Unknown Location Found'
     );
     if(response.statusCode == 200 && response.body['content']['status'] == 'OK') {
 

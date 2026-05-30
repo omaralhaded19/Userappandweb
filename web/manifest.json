@@ -1,11 +1,11 @@
 {
-    "name": "Seohost",
-    "short_name": "Seohost",
+    "name": "Gadha - قدها",
+    "short_name": "Gadha",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A complete on-demand booking service platform.",
+    "description": "Gadha is a platform that connects customers with local service providers, offering a wide range of services such as home cleaning, repairs, and maintenance. With a user-friendly interface and reliable service providers, Gadha aims to make it easy for customers to find and book the services they need.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -7,99 +7,59 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:766014068058:android:5d68cb72fd16336c504f63",
+        "mobilesdk_app_id": "1:766014068058:android:e5f19e86455dd6a2504f63",
         "android_client_info": {
           "package_name": "com.alrafayah.shooping"
         }
       },
       "oauth_client": [
         {
-          "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+          "client_id": "766014068058-c1043d8v6dt270t6kmjres2412hp6b96.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alrafayah.shooping",
+            "certificate_hash": "0cc2dc6155deca69e612a55648dd1d357c00f776"
+          }
+        },
+        {
+          "client_id": "766014068058-d3q51hu89u43qqdf6224plf7fdk22s0l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alrafayah.shooping",
+            "certificate_hash": "0aaf5369a82614ffb5e8ec22b8f979581df039ff"
+          }
+        },
+        {
+          "client_id": "766014068058-ddfgbtcb6of9ka9od71s9eifq67034dl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alrafayah.shooping",
+            "certificate_hash": "3fc68c2dfcd5e90a7dea4a72240d9c541218ca1f"
+          }
+        },
+        {
+          "client_id": "766014068058-li2bfkk2shc3oro9i436ussasign5b2p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alrafayah.shooping",
+            "certificate_hash": "bb7577102b18f9548c13387a1568477b72333421"
+          }
+        },
+        {
+          "client_id": "766014068058-rmelktotr7j1il8pnaspo7rhk1cqh6qp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB3IOqUo9Q2FuNFGO9stIZkrq-YoQZ9gI0"
+          "current_key": "AIzaSyB8ZAFd5Sr9DpXS1mYZVvM33wN6ZWpnCGQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "766014068058-i5hl3oh8ubj38bmvb1b3nmqu2j0ncc5q.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.alrafayah.shooping"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:766014068058:android:f97463ad5cbb679a504f63",
-        "android_client_info": {
-          "package_name": "com.alrafayah.shoopingadmin"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyB3IOqUo9Q2FuNFGO9stIZkrq-YoQZ9gI0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "766014068058-i5hl3oh8ubj38bmvb1b3nmqu2j0ncc5q.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.alrafayah.shooping"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:766014068058:android:63fa21b7312f8ebb504f63",
-        "android_client_info": {
-          "package_name": "com.alrafayah.shoopingcar"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyB3IOqUo9Q2FuNFGO9stIZkrq-YoQZ9gI0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "766014068058-i9792tjfeuf8srgr3rnml6koaricnh7s.apps.googleusercontent.com",
+              "client_id": "766014068058-6n6sf4hitmb6in796eci5f7a7bvbqr8j.apps.googleusercontent.com",
               "client_type": 3
             },
             {

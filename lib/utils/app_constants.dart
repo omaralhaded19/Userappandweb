@@ -1,11 +1,10 @@
 import 'package:seohost/utils/core_export.dart';
 
 class AppConstants {
-
-
-  static const String appName = 'مؤسسة الرفايعة للخدمات المنزلية';
-  static const String appVersion = '3.3'; /// Flutter SDK : 3.25.1
-  static const String baseUrl = 'https://alrafayah2026.alrafayah.com';
+  static const String appName = 'قدها - للخدمات المنزلية';
+  static const String appVersion = '6.0.3';   /// Flutter SDK : 3.25.1
+  static const String baseUrl = 'https://master.alrafayah.com';
+  static const String googleWebClientId = '766014068058-rmelktotr7j1il8pnaspo7rhk1cqh6qp.apps.googleusercontent.com';
   static const bool avoidMaintenanceMode = false;
   static const LocalCachesTypeEnum cachesType = LocalCachesTypeEnum.all;
   static const String categoryUrl = '/api/v1/customer/category?limit=20';
@@ -23,7 +22,7 @@ class AppConstants {
   static const String itemsBasedOnCampaignId = '/api/v1/customer/campaign/data/items?campaign_id=';
   static const String serviceDetailsUri = '/api/v1/customer/service/detail';
   static const String getServiceReviewList = '/api/v1/customer/service/review/';
-  static const String subcategoryUri = '/api/v1/customer/category/childes?limit=20&offset=1&id=';
+  static const String subcategoryUri = '/api/v1/customer/category/childes?limit=100&offset=1&id=';
   static const String categoryServiceUri = '/api/v1/categories/service/';
   static const String configUri = '/api/v1/customer/config';
   static const String customerRemove = '/api/v1/customer/remove-account';
@@ -84,7 +83,6 @@ class AppConstants {
   static const String getProviderDetails = '/api/v1/customer/provider-details';
   static const String getProviderBasedOnSubcategory = '/api/v1/customer/provider/list-by-sub-category';
   static const String getFeaturedCategoryService = '/api/v1/customer/featured-categories?limit=100&offset=1';
-
   static const String createCustomizedPost = '/api/v1/customer/post';
   static const String getMyPostList = '/api/v1/customer/post';
   static const String getInterestedProviderList = '/api/v1/customer/post/bid';
@@ -92,34 +90,30 @@ class AppConstants {
   static const String getPostDetails = '/api/v1/customer/post/details';
   static const String updatePostInfo = '/api/v1/customer/post/update-info';
   static const String getProviderBidDetails = '/api/v1/customer/post/bid/details';
-
   static const String sendOtpForVerification = '/api/v1/user/verification/send-otp';
   static const String sendOtpForForgetPassword = '/api/v1/user/forget-password/send-otp';
   static const String verifyOtpForForgetPasswordScreen = '/api/v1/user/forget-password/verify-otp';
   static const String verifyOtpForVerificationScreen = '/api/v1/user/verification/verify-otp';
-  static const String phoneOtpVerification= '/api/v1/user/verification/login-otp-verify';
+  static const String phoneOtpVerification = '/api/v1/user/verification/login-otp-verify';
   static const String firebaseOtpVerify = '/api/v1/user/verification/firebase-auth-verify';
   static const String registerWithOtp = '/api/v1/user/verification/registration-with-otp';
   static const String resetPasswordUri = '/api/v1/user/forget-password/reset';
-
   static const String offlinePaymentUri = '/api/v1/customer/offline-payment/methods?limit=100&offset=1';
   static const String getZoneListApi = '/api/v1/customer/service/area-availability?offset=1&limit=200';
   static const String rebookApi = '/api/v1/customer/rebook/cart-add';
   static const String rebookAvailabilityApi = '/api/v1/customer/rebooking-information?limit=100&offset=1';
   static const String changeLanguage = '/api/v1/customer/change-language';
-
   static const String getFavoriteServiceList = '/api/v1/customer/favorite/service-list';
   static const String removeFavoriteService = "/api/v1/customer/favorite/service-delete";
   static const String updateFavoriteServiceStatus = "/api/v1/customer/favorite/service";
   static const String getFavoriteProviderList = '/api/v1/customer/favorite/provider-list';
   static const String removeFavoriteProvider = "/api/v1/customer/favorite/provider-destroy";
   static const String updateFavoriteProviderStatus = "/api/v1/customer/favorite/provider";
-
   static const String advertisementList = '/api/v1/customer/advertisements/ads-list?limit=50&offset=1';
   static const String registerWithSocialMedia = '/api/v1/customer/auth/registration-with-social-media';
   static const String existingAccountCheck = '/api/v1/customer/auth/existing-account-check';
   static const String regularBookingInvoiceUrl = '/admin/booking/customer-invoice/';
-  static const String repeatBookingInvoiceUrl = '/admin/booking/customer-fullbooking-invoice/';
+  static const String repeatBookingInvoiceUrl =  '/admin/booking/customer-fullbooking-invoice/';
   static const String singleRepeatBookingInvoiceUrl = '/admin/booking/customer-fullbooking-single-invoice/';
   static const String addError404Url = '/api/v1/customer/error-link';
   static const String checkExistingUser = '/api/v1/user/check-existing-customer';
@@ -127,9 +121,6 @@ class AppConstants {
   static const String switchPaymentMethod = '/api/v1/customer/booking/switch-payment-method';
   static const String digitalPaymentResponse = '/api/v1/digital-payment-booking-response';
   static const String newsLetterSubscription = '/api/v1/customer/subscribe-newsletter';
-
-
-
   /// Shared Key
   static const String theme = 'demand_theme';
   static const String token = 'demand_token';
@@ -155,17 +146,25 @@ class AppConstants {
   static const String referredBottomSheet = 'referred_bottom_sheet';
   static const String lastIncompleteOfflineBookingId = 'last_incomplete_offline_booking_id';
 
-
   static Map<String, String> configHeader = {
     'Content-Type': 'application/json; charset=UTF-8',
-    AppConstants.zoneId : 'configuration',
+    AppConstants.zoneId: 'configuration',
   };
 
   static List<LanguageModel> languages = [
-    LanguageModel(imageUrl: Images.us, languageName: 'English', countryCode: 'US', languageCode: 'en'),
-    LanguageModel(imageUrl: Images.ar, languageName: 'العربية', countryCode: 'SA', languageCode: 'ar')
+    LanguageModel(
+      imageUrl: Images.ar,
+      languageName: 'العربية',
+      countryCode: 'SA',
+      languageCode: 'ar',
+    ),
+    LanguageModel(
+      imageUrl: Images.us,
+      languageName: 'English',
+      countryCode: 'US',
+      languageCode: 'en',
+    ),
   ];
-
 
   static const double limitOfPickedImageSizeInMB = 2;
   static const int limitOfPickedIdentityImageNumber = 2;
@@ -176,41 +175,13 @@ class AppConstants {
   static const double maxSizeOfASingleFile = 10;
 
   static final List<Map<String, String>> walletTransactionSortingList = [
-    {
-      'title' : 'all_transactions',
-      'value' : ''
-    },
-    {
-      'title' : 'booking_transaction',
-      'value' : 'wallet_payment'
-    },
-    {
-      'title' : 'converted_from_loyalty_point',
-      'value' : 'loyalty_point_earning'
-    },
-    {
-      'title' : 'added_via_payment_method',
-      'value' : 'add_fund'
-    },
-    {
-      'title' : 'earned_by_bonus',
-      'value' : 'add_fund_bonus'
-    },
-    {
-      'title' : 'earned_by_referral',
-      'value' : 'referral_earning'
-    },
-    {
-      'title' : 'admin_fund',
-      'value' : 'fund_by_admin'
-    },
-    {
-      'title' : 'refund',
-      'value' : 'booking_refund'
-    },
+    {'title': 'all_transactions', 'value': ''},
+    {'title': 'booking_transaction', 'value': 'wallet_payment'},
+    {'title': 'converted_from_loyalty_point', 'value': 'loyalty_point_earning'},
+    {'title': 'added_via_payment_method', 'value': 'add_fund'},
+    {'title': 'earned_by_bonus', 'value': 'add_fund_bonus'},
+    {'title': 'earned_by_referral', 'value': 'referral_earning'},
+    {'title': 'admin_fund', 'value': 'fund_by_admin'},
+    {'title': 'refund', 'value': 'booking_refund'},
   ];
-
-
-
-
 }

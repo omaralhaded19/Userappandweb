@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:seohost/utils/core_export.dart';
 import 'package:get/get.dart';
 
-
 class CheckoutRepo extends GetxService {
   final ApiClient apiClient;
   CheckoutRepo({required this.apiClient});
 
   Future<Response> getPostDetails(String postId, String bidId) async {
-    return await apiClient.getData('${AppConstants.getPostDetails}/$postId?post_bid_id=$bidId');
+    return await apiClient.getData(
+      '${AppConstants.getPostDetails}/$postId?post_bid_id=$bidId',
+    );
   }
 
   Future<Response> getOfflinePaymentMethod() async {
@@ -17,62 +18,82 @@ class CheckoutRepo extends GetxService {
   }
 
   Future<Response> getDigitalPaymentResponse({String? transactionId}) async {
-    return await apiClient.getData('${AppConstants.digitalPaymentResponse}?transaction_id=$transactionId');
+    return await apiClient.getData(
+      '${AppConstants.digitalPaymentResponse}?transaction_id=$transactionId',
+    );
   }
 
   Future<Response?> checkExistingUser({required String phone}) async {
-    return await apiClient.postData(
-      AppConstants.checkExistingUser,
-      {
-        "phone": phone,
-      },
-    );
+    return await apiClient.postData(AppConstants.checkExistingUser, {
+      "phone": phone,
+    });
   }
 
-  Future<Response?>submitOfflinePaymentData({required String bookingId, required String offlinePaymentId, required offlinePaymentInfo, required int isPartialPayment}) async {
-    return await apiClient.postData(
-      AppConstants.offlinePaymentDataStore,
-      {
-        "booking_id": bookingId,
-        "offline_payment_id" : offlinePaymentId,
-        "customer_information" : offlinePaymentInfo,
-        "is_partial" : isPartialPayment,
-      },
-    );
+  Future<Response?> submitOfflinePaymentData({
+    required String bookingId,
+    required String offlinePaymentId,
+    required offlinePaymentInfo,
+    required int isPartialPayment,
+  }) async {
+    return await apiClient.postData(AppConstants.offlinePaymentDataStore, {
+      "booking_id": bookingId,
+      "offline_payment_id": offlinePaymentId,
+      "customer_information": offlinePaymentInfo,
+      "is_partial": isPartialPayment,
+    });
   }
 
-  Future<Response?> switchPaymentMethod({required String bookingId,  required String paymentMethod,  int isPartial = 0,  String? offlinePaymentId, String? offlinePaymentInfo}) async {
-    return await apiClient.postData(
-      AppConstants.switchPaymentMethod,
-      {
-        "booking_id": bookingId,
-        "payment_method" : paymentMethod,
-        "offline_payment_id" : offlinePaymentId,
-        "customer_information" : offlinePaymentInfo,
-        "is_partial" : isPartial
-      },
-    );
+  Future<Response?> switchPaymentMethod({
+    required String bookingId,
+    required String paymentMethod,
+    int isPartial = 0,
+    String? offlinePaymentId,
+    String? offlinePaymentInfo,
+  }) async {
+    return await apiClient.postData(AppConstants.switchPaymentMethod, {
+      "booking_id": bookingId,
+      "payment_method": paymentMethod,
+      "offline_payment_id": offlinePaymentId,
+      "customer_information": offlinePaymentInfo,
+      "is_partial": isPartial,
+    });
   }
 
   Future<Response> placeBookingRequest({
-    required String paymentMethod, String? serviceAddressID, required AddressModel serviceAddress,String? schedule,
-    required String zoneId, required int isPartial, required String serviceLocation,
-    required String serviceType, String? bookingType, String? dates, SignUpBody? newUserInfo
+    required String paymentMethod,
+    String? serviceAddressID,
+    required AddressModel serviceAddress,
+    String? schedule,
+    required String zoneId,
+    required int isPartial,
+    required String serviceLocation,
+    required String serviceType,
+    String? bookingType,
+    String? dates,
+    SignUpBody? newUserInfo,
+    String? bookingNote,
   }) async {
     String address = jsonEncode(serviceAddress);
+    final normalizedAddressId =
+        serviceAddressID == null ||
+            serviceAddressID.isEmpty ||
+            serviceAddressID == "null"
+        ? null
+        : serviceAddressID;
     return await apiClient.postData(AppConstants.placeRequest, {
-      "payment_method" : paymentMethod,
-      "zone_id" : zoneId,
-      "service_schedule" : schedule,
-      "service_address_id" : serviceAddressID,
-      "guest_id" : Get.find<SplashController>().getGuestId(),
-      "service_address" : address,
-      "is_partial" : isPartial,
+      "payment_method": paymentMethod,
+      "zone_id": zoneId,
+      "service_schedule": schedule,
+      "service_address_id": normalizedAddressId,
+      "guest_id": Get.find<SplashController>().getGuestId(),
+      "service_address": address,
+      "is_partial": isPartial,
       "service_type": serviceType,
       "booking_type": bookingType,
       "dates": dates,
-      "new_user_info": newUserInfo !=null ? jsonEncode(newUserInfo) : null,
-      "service_location": serviceLocation
+      "new_user_info": newUserInfo != null ? jsonEncode(newUserInfo) : null,
+      "service_location": serviceLocation,
+      "booking_note": bookingNote ?? "",
     });
   }
 }
