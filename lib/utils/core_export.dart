@@ -133,7 +133,7 @@ export 'package:seohost/common/widgets/title_widget.dart';
 export 'dart:collection';
 export 'package:seohost/common/widgets/no_internet_screen.dart';
 export 'package:google_sign_in/google_sign_in.dart';
-export 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+export 'package:seohost/common/social/facebook_auth_stub.dart';
 export 'package:seohost/utils/gaps.dart';
 export 'package:seohost/feature/offers/offer_screen.dart';
 export 'package:url_launcher/url_launcher.dart';

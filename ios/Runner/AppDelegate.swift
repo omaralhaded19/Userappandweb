@@ -3,8 +3,6 @@ import Flutter
 import GoogleMaps
 import Firebase
 import flutter_downloader
-import FBSDKCoreKit
-import FBSDKLoginKit
 
 
 @main
